@@ -1,0 +1,21 @@
+{
+  "name": "rainy",
+  "version": "1.0.0",
+  "main": "bot.js",
+  "license": "MIT",
+  "author": {
+    "name": "AlexZeDim",
+    "email": "AlexZeDim2812@ya.com",
+    "url": "https://twitter.com/alexzedim2812"
+  },
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "languageName": "node",
+  "dependencies": {
+    "discord.js": "^12.3.1"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
