@@ -19,7 +19,7 @@ If bot doesn't rename the user, well, mainly because lack of permissions.
 
 ## How to invite?
 
-If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free yo use.
+If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free to use.
 
 ## I have found a bug or say want to say «Thank you», what should I do?
 
