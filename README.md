@@ -17,10 +17,10 @@ Rainy need `rename user` permissions and the most top role above all others. It 
 If bot doesn't rename the user, well, mainly because lack of permissions.
 
 
-## How to add
+## How to invite?
 
 If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free yo use.
 
-## I have found a bug or say «Thank you», what should I do?
+## I have found a bug or say want to say «Thank you», what should I do?
 
 You post an issue in this repo, or DM me via Discord, my tag is: `AlexZeDim#2645`. I am open to anyone, even w/o friend request.
