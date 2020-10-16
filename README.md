@@ -13,7 +13,7 @@ Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.gg/yA
 
 ## Permissions
 
-Rainy need `rename user` permissions and the most top role above all others. It doesn't need admin or any other special permissions. But anyway, since the code is open-sourced you could give to the bot any permissions and it won't abuse it.
+Rainy needs `rename user` permissions and the most top role above all others. It doesn't need admin or any other special permissions. But anyway, since the code is open-sourced you could give to the bot any permissions and it won't abuse it.
 If bot doesn't rename the user, well, mainly because lack of permissions.
 
 
