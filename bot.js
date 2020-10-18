@@ -133,6 +133,7 @@ function normalizeGreek(text) {
     return text;
 }
 
+
 /**
  * Rename
  */
@@ -141,6 +142,7 @@ bot.on('guildMemberAdd', async (guild_member) => {
     try {
         let username = guild_member.user.username
         username = username.toLowerCase()
+        username = username.normalize("NFD")
         username = normalizeGreek(username)
         username = username.replace('͜', '')
         username = username.replace('1', 'i')
@@ -148,13 +150,16 @@ bot.on('guildMemberAdd', async (guild_member) => {
         username = username.replace(/\[.*?]/gi, '')
         username = username.replace(/\(.*?\)/gi, '')
         username = username.replace(/\{.*?}/gi, '')
-        username = username.replace(/[`~!@#$%^&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
+        username = username.replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
         username = username.replace(/\d/g,'')
         username = replaceDiacritics(username)
         username = username.replace(/[^a-яA-Я]/g, "")
-        username = username.charAt(0).toUpperCase() + username.slice(1);
-        if (!username || username === '') {
-            username = 'Recruit';
+        const C = username.replace(/[^a-zA-Z]/g, "").length
+        const L = username.replace(/[^а-яА-Я]/g, "").length
+        if (L >= C) {
+            username = username.replace(/[^а-яА-Я]/g, "")
+        } else {
+            username = username.replace(/[^a-zA-Z]/g, "")
         }
         await guild_member.setNickname(username)
     } catch (e) {
