@@ -120,6 +120,18 @@ function replaceDiacritics (str) {
     });
 }
 
+function replaceGreeks (str) {
+    str = str.replace(/^\s+|\s+$/g, '').toLowerCase();
+    const from = ["ου", "ΟΥ", "Ού", "ού", "αυ", "ΑΥ", "Αύ", "αύ", "ευ", "ΕΥ", "Εύ", "εύ", "α", "Α", "ά", "Ά", "β", "Β", "γ", "Γ", "δ", "Δ", "ε", "Ε", "έ", "Έ", "ζ", "Ζ", "η", "Η", "ή", "Ή", "θ", "Θ", "ι", "Ι", "ί", "Ί", "ϊ", "ΐ", "Ϊ", "κ", "Κ", "λ", "Λ", "μ", "Μ", "ν", "Ν", "ξ", "Ξ", "ο", "Ο", "ό", "Ό", "π", "Π", "ρ", "Ρ", "σ", "Σ", "ς", "τ", "Τ", "υ", "Υ", "ύ", "Ύ", "ϋ", "ΰ", "Ϋ", "φ", "Φ", "χ", "Χ", "ψ", "Ψ", "ω", "Ω", "ώ", "Ώ"];
+    const to = ["ou", "ou", "ou", "ou", "au", "au", "au", "au", "eu", "eu", "eu", "eu", "a", "a", "a", "a", "b", "b", "g", "g", "d", "d", "e", "e", "e", "e", "z", "z", "i", "i", "i", "i", "th", "th", "i", "i", "i", "i", "i", "i", "i", "k", "k", "a", "a", "m", "m", "n", "n", "ks", "ks", "o", "o", "o", "o", "p", "p", "r", "r", "s", "s", "s", "t", "t", "y", "y", "y", "y", "y", "y", "y", "f", "f", "x", "x", "ps", "ps", "o", "o", "o", "o"];
+    for (let i = 0; i < from.length; i++) {
+        while (str.indexOf(from[i]) !== -1) {
+            str = str.replace(from[i], to[i]);    // CONVERT GREEK CHARACTERS TO LATIN LETTERS
+        }
+    }
+    return str.replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+}
+
 /**
  * Rename
  */
@@ -128,9 +140,16 @@ bot.on('guildMemberAdd', async (guild_member) => {
     try {
         let username = guild_member.user.username
         username = username.toLowerCase()
+        username = username.replace('͜', '')
+        username = username.replace('1', 'i')
+        username = username.replace('$', 's')
+        username = username.replace(/\[.*?]/gi, '')
+        username = username.replace(/\(.*?\)/gi, '')
+        username = username.replace(/\{.*?}/gi, '')
         username = username.replace(/[`~!@#$%^&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
         username = username.replace(/\d/g,'')
         username = replaceDiacritics(username)
+        username = replaceGreeks(username)
         username = username.replace(/[^a-яA-Я]/g, "")
         username = username.charAt(0).toUpperCase() + username.slice(1);
         if (!username || username === '') {
