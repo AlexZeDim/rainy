@@ -7,7 +7,7 @@ const bot = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
  */
 
 bot.on('ready', async () => {
-    console.log(`Logged in as ${bot.user.tag}!`);
+    console.info(`Logged in as ${bot.user.tag}!`);
     await bot.user.setPresence({
         status: "online",
         activity: {
@@ -153,32 +153,29 @@ function normalizeGreek(text) {
  */
 
 bot.on('guildMemberAdd', async (guild_member) => {
-    try {
-        let username = guild_member.user.username
-        username = username.toLowerCase()
-        username = username.normalize("NFD")
-        username = normalizeGreek(username)
-        username = username.replace('͜', '')
-        username = username.replace('1', 'i')
-        username = username.replace('$', 's')
-        username = username.replace(/\[.*?]/gi, '')
-        username = username.replace(/\(.*?\)/gi, '')
-        username = username.replace(/\{.*?}/gi, '')
-        username = username.replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
-        username = username.replace(/\d/g,'')
-        username = replaceDiacritics(username)
-        username = username.replace(/[^a-яA-Я]/g, "")
-        const C = username.replace(/[^a-zA-Z]/g, "").length
-        const L = username.replace(/[^а-яА-Я]/g, "").length
-        if (L >= C) {
-            username = username.replace(/[^а-яА-Я]/g, "")
-        } else {
-            username = username.replace(/[^a-zA-Z]/g, "")
-        }
-        await guild_member.setNickname(username)
-    } catch (e) {
-        console.error(e)
+    let username = guild_member.user.username
+    username = username.toLowerCase()
+    username = username.normalize("NFD")
+    username = normalizeGreek(username)
+    username = username.replace('͜', '')
+    username = username.replace('1', 'i')
+    username = username.replace('$', 's')
+    username = username.replace(/\[.*?]/gi, '')
+    username = username.replace(/\(.*?\)/gi, '')
+    username = username.replace(/\{.*?}/gi, '')
+    username = username.replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
+    username = username.replace(/\d/g,'')
+    username = replaceDiacritics(username)
+    username = username.replace(/[^a-яA-Я]/g, "")
+    const C = username.replace(/[^a-zA-Z]/g, "").length
+    const L = username.replace(/[^а-яА-Я]/g, "").length
+    if (L >= C) {
+        username = username.replace(/[^а-яА-Я]/g, "")
+    } else {
+        username = username.replace(/[^a-zA-Z]/g, "")
     }
+    username = username[0].toUpperCase() + username.slice(1)
+    await guild_member.setNickname(username)
 });
 
 bot.login(process.env.discord);
