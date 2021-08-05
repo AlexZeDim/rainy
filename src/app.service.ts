@@ -45,7 +45,7 @@ export class AppService implements OnApplicationBootstrap {
         .replace('$', 's')
         .replace(/\[.*?]/gi, '')
         .replace(/\(.*?\)/gi, '')
-        .replace(/\{.*?}/gi, '')
+        .replace(/{.*?}/gi, '')
         .replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '')
         .replace(/\d/g,'')
 
