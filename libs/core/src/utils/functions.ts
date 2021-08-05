@@ -10,3 +10,5 @@ export const normalizeGreek = (text: string) =>
   .replace(/ύ|ΰ|ϋ/g, 'v')
   .replace(/Ώ|Ω|ώ/g, 'o')
   .replace(/Σ|ς/g, 'z');
+
+export const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1)

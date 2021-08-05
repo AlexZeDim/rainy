@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import * as Discord from 'discord.js';
-import { normalizeGreek, replaceDiacritics } from '@app/core/utils';
+import { capitalize, normalizeGreek, replaceDiacritics } from '@app/core/utils';
 import { diacriticsJson } from '@app/core';
 
 @Injectable()
@@ -39,24 +39,27 @@ export class AppService implements OnApplicationBootstrap {
       username = username.toLowerCase();
       username = username.normalize("NFD");
       username = normalizeGreek(username);
-      username = username.replace('͜', '');
-      username = username.replace('1', 'i');
-      username = username.replace('$', 's');
-      username = username.replace(/\[.*?]/gi, '');
-      username = username.replace(/\(.*?\)/gi, '');
-      username = username.replace(/\{.*?}/gi, '');
-      username = username.replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '');
-      username = username.replace(/\d/g,'');
+      username = username
+        .replace('͜', '')
+        .replace('1', 'i')
+        .replace('$', 's')
+        .replace(/\[.*?]/gi, '')
+        .replace(/\(.*?\)/gi, '')
+        .replace(/\{.*?}/gi, '')
+        .replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '')
+        .replace(/\d/g,'')
+
       username = replaceDiacritics(this.diacritics, username);
       username = username.replace(/[^a-яA-Я]/g, '');
+
       const C = username.replace(/[^a-zA-Z]/g, '').length;
       const L = username.replace(/[^а-яА-Я]/g, '').length;
 
       (L >= C)
-        ? username = username.replace(/[^а-яА-Я]/g, "")
-        : username = username.replace(/[^a-zA-Z]/g, "")
+        ? username = username.replace(/[^а-яА-Я]/g, '')
+        : username = username.replace(/[^a-zA-Z]/g, '')
 
-      username = username[0].toUpperCase() + username.slice(1);
+      username = capitalize(username);
 
       await guild_member.setNickname(username);
     })
