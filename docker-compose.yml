@@ -2,7 +2,9 @@ version: '3.8'
 services:
   rainy:
     build: ./
-    image: conglomerat
+    image: rainy
     container_name: rainy
     restart: always
     command: [ 'node', 'dist/main.js' ]
+    env_file:
+      - .env
