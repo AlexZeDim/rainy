@@ -35,6 +35,7 @@ export class AppService implements OnApplicationBootstrap {
     });
 
     this.client.on('guildMemberAdd', async (guild_member) => {
+      const oldUsername = guild_member.user.username;
       let username = guild_member.user.username;
       username = username.toLowerCase();
       username = username.normalize("NFD");
@@ -62,6 +63,7 @@ export class AppService implements OnApplicationBootstrap {
       username = capitalize(username);
 
       await guild_member.setNickname(username);
+      this.logger.log(`Rename user from ${oldUsername} to ${username}`)
     })
   }
 }

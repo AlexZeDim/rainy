@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  rainy:
+    build: ./
+    image: conglomerat
+    container_name: rainy
+    restart: always
+    command: [ 'node', 'dist/main.js' ]
