@@ -1,7 +1,0 @@
-apps:
-  - script: ./bot.js
-    name: 'DISCORD-RAINY'
-    instances: 1
-    autorestart: true
-    log_date_format: 'DD/MM HH:mm:ss.SSS'
-    restart_delay: 1000
