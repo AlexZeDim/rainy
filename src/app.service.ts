@@ -1,13 +1,10 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import * as Discord from 'discord.js';
-import { capitalize, normalizeGreek, replaceDiacritics } from '@app/core/utils';
-import { diacriticsJson } from '@app/core';
+import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
   private client: Discord.Client
-
-  private diacritics: Record<string, string>
 
   private readonly logger = new Logger(
     AppService.name, { timestamp: true },
@@ -16,7 +13,6 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     this.client = new Discord.Client();
-    this.diacritics = diacriticsJson;
     await this.client.login(process.env.discord);
     await this.bot();
   }
@@ -39,7 +35,7 @@ export class AppService implements OnApplicationBootstrap {
       let username = guild_member.user.username;
       username = username.toLowerCase();
       username = username.normalize("NFD");
-      username = normalizeGreek(username);
+      username = normalizeDiacritics(username);
       username = username
         .replace('͜', '')
         .replace('1', 'i')
@@ -50,9 +46,6 @@ export class AppService implements OnApplicationBootstrap {
         .replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '')
         .replace(/\d/g,'')
 
-      username = replaceDiacritics(this.diacritics, username);
-      username = username.replace(/[^a-яA-Я]/g, '');
-
       const C = username.replace(/[^a-zA-Z]/g, '').length;
       const L = username.replace(/[^а-яА-Я]/g, '').length;
 
@@ -60,7 +53,7 @@ export class AppService implements OnApplicationBootstrap {
         ? username = username.replace(/[^а-яА-Я]/g, '')
         : username = username.replace(/[^a-zA-Z]/g, '')
 
-      username = capitalize(username);
+      username = username.length === 0 ? 'Username' : capitalizeFirstLetter(username);
 
       await guild_member.setNickname(username);
       this.logger.log(`Rename user from ${oldUsername} to ${username}`)

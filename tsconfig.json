@@ -12,13 +12,6 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "paths": {
-      "@app/core": [
-        "libs/core/src"
-      ],
-      "@app/core/*": [
-        "libs/core/src/*"
-      ]
-    }
+    "paths": { }
   }
 }
