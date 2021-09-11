@@ -22,11 +22,7 @@ export class AppService implements OnApplicationBootstrap {
         // Intents.FLAGS.GUILD_MESSAGES,
       ],
       presence: {
-        status: 'online',
-        activities: [{
-          name: 'users',
-          type: 3,
-        }]
+        status: 'online'
       }
     });
     await this.client.login(process.env.discord);
