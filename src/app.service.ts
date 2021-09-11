@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 import { Intents, Client } from 'discord.js';
+import { DISCORD_SERVERS_ENUM, PALADIN_ROLES } from '@app/oraculum';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -19,7 +20,7 @@ export class AppService implements OnApplicationBootstrap {
         Intents.FLAGS.GUILDS,
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_INVITES,
-        // Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGES,
       ],
       presence: {
         status: 'online'
@@ -35,7 +36,7 @@ export class AppService implements OnApplicationBootstrap {
     )
 
 
-    /*
+
     this.client.on('messageCreate', async (message) => {
       if (message.guildId === DISCORD_SERVERS_ENUM.SanctumOfLight) {
 
@@ -44,7 +45,7 @@ export class AppService implements OnApplicationBootstrap {
           await guildMember.roles.add(PALADIN_ROLES.PaladinMember);
         }
       }
-    });*/
+    });
 
     /*
     this.client.on('guildBanAdd', async (ban) => {
