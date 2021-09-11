@@ -12,6 +12,13 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "paths": { }
+    "paths": {
+      "@app/oraculum": [
+        "libs/oraculum/src"
+      ],
+      "@app/oraculum/*": [
+        "libs/oraculum/src/*"
+      ]
+    }
   }
 }

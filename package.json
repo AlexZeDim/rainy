@@ -29,7 +29,7 @@
     "@nestjs/common": "8.0.5",
     "@nestjs/core": "8.0.5",
     "@nestjs/platform-express": "8.0.5",
-    "discord.js": "12.5.3",
+    "discord.js": "13.1.0",
     "normalize-text": "2.3.2",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
@@ -78,7 +78,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/core(|/.*)$": "<rootDir>/libs/core/src/$1"
+      "^@app/core(|/.*)$": "<rootDir>/libs/core/src/$1",
+      "^@app/oraculum(|/.*)$": "<rootDir>/libs/oraculum/src/$1"
     }
   }
 }

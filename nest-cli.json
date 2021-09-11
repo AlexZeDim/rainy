@@ -1,7 +1,17 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
-  "projects": { },
+  "projects": {
+    "oraculum": {
+      "type": "library",
+      "root": "libs/oraculum",
+      "entryFile": "index",
+      "sourceRoot": "libs/oraculum/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/oraculum/tsconfig.lib.json"
+      }
+    }
+  },
   "compilerOptions": {
     "webpack": true
   }
