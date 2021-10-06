@@ -13,11 +13,11 @@
     "incremental": true,
     "skipLibCheck": true,
     "paths": {
-      "@app/oraculum": [
-        "libs/oraculum/src"
+      "@app/shared": [
+        "libs/shared/src"
       ],
-      "@app/oraculum/*": [
-        "libs/oraculum/src/*"
+      "@app/shared/*": [
+        "libs/shared/src/*"
       ]
     }
   }

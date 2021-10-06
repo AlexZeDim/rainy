@@ -2,13 +2,13 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "projects": {
-    "oraculum": {
+    "shared": {
       "type": "library",
-      "root": "libs/oraculum",
+      "root": "libs/shared",
       "entryFile": "index",
-      "sourceRoot": "libs/oraculum/src",
+      "sourceRoot": "libs/shared/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/oraculum/tsconfig.lib.json"
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     }
   },
