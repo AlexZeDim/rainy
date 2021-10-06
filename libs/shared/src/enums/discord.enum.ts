@@ -20,7 +20,7 @@ export enum DISCORD_SERVER_RENAME_ENUM {
 }
 
 export enum CROSS_CLASS_CHANNELS {
-  Test = '895301502485270618'
+  BanThread = '895301502485270618'
 }
 
 export enum DISCORD_BAN_REASON_ENUM {
@@ -34,8 +34,13 @@ export enum DISCORD_BAN_REASON_ENUM {
   trash_ru = 'мусор',
 }
 
+export enum DISCORD_LOGS_ENUM {
+  Paladin = '895342818334212117',
+  Shaman = '895342834079653969',
+  Monk = '895342846129864714',
+}
+
 export enum DISCORD_AUTHORIZED_ENUM {
-  Me = '240464611562881024',
   // Shaman
   Amani = '158715861362802689',
   Orenji = '520691292758474752',

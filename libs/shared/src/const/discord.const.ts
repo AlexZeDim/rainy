@@ -1,14 +1,14 @@
+import { Snowflake } from "discord.js";
 import {
   DISCORD_AUTHORIZED_ENUM,
-  DISCORD_BAN_REASON_ENUM,
+  DISCORD_BAN_REASON_ENUM, DISCORD_LOGS_ENUM,
   DISCORD_SERVER_RENAME_ENUM,
   DISCORD_SERVERS_ENUM
 } from "@app/shared/enums";
-import { Snowflake } from "discord.js";
 
 export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.SanctumOfLight, '741997711678636074'],
-  [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, '741997711678636074'],
+  [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, '741997711926100018'],
   [DISCORD_SERVERS_ENUM.Maelstorm, '741997712035020860'],
   [DISCORD_SERVERS_ENUM.Akerus, '741997712022438018'],
   [DISCORD_SERVERS_ENUM.DreamGroove, '741997711779168328'],
@@ -20,8 +20,13 @@ export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.TempleOfVoidLight, '741997711854665798'],
 ]);
 
+export const DISCORD_LOGS: Map<Snowflake, Snowflake> = new Map([
+  [DISCORD_SERVERS_ENUM.SanctumOfLight, DISCORD_LOGS_ENUM.Paladin],
+  [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, DISCORD_LOGS_ENUM.Monk],
+  [DISCORD_SERVERS_ENUM.Maelstorm, DISCORD_LOGS_ENUM.Shaman],
+]);
+
 export const DISCORD_RELATIONS: Map<string, string> = new Map([
-  [DISCORD_AUTHORIZED_ENUM.Me, DISCORD_SERVERS_ENUM.Test],
   [DISCORD_AUTHORIZED_ENUM.Rainon, DISCORD_SERVERS_ENUM.SanctumOfLight],
   [DISCORD_AUTHORIZED_ENUM.Solifugae, DISCORD_SERVERS_ENUM.SanctumOfLight],
   [DISCORD_AUTHORIZED_ENUM.Uchur, DISCORD_SERVERS_ENUM.SanctumOfLight],
