@@ -4,11 +4,9 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   CROSS_CLASS_CHANNELS,
   DISCORD_BANS,
-  DISCORD_EMOJI,
+  DISCORD_EMOJI, DISCORD_LOGS,
   DISCORD_RELATIONS,
   DISCORD_SERVER_RENAME,
-  DISCORD_SERVERS_ENUM,
-  PALADIN_ROLES
 } from '@app/shared';
 import {
   Intents,
@@ -19,28 +17,31 @@ import {
   ButtonInteraction,
   Snowflake,
   TextChannel,
-  InteractionCollector,
+  InteractionCollector, Channel,
 } from 'discord.js';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
   private client: Client
 
-  private banUserID: Snowflake;
-
   private timeout: number = 1000 * 60 * 60 * 12;
-
-  // private banList: Map<Snowflake, Snowflake> = new Map([]);
 
   private channel: TextChannel;
 
   private collector: InteractionCollector<ButtonInteraction>;
 
+  private readonly logger = new Logger(
+    AppService.name, { timestamp: true },
+  );
+
+  constructor(
+    @InjectRedis()
+    private readonly redisService: Redis,
+  ) {}
+
   private filterBan = async (interaction: ButtonInteraction): Promise<boolean> => {
     try {
-      // console.log(interaction);
-      // TODO array, set or something like that
-      if (this.banList.has(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
+      if (!!await this.redisService.get(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
         const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
         const guild = this.client.guilds.cache.get(discordClassID);
         if (guild) {
@@ -55,17 +56,9 @@ export class AppService implements OnApplicationBootstrap {
     }
   };
 
-  private readonly logger = new Logger(
-    AppService.name, { timestamp: true },
-  );
-
-  constructor(
-    @InjectRedis()
-    private readonly redisService: Redis,
-  ) {}
-
   async onApplicationBootstrap(): Promise<void> {
     try {
+      await this.redisService.flushall();
       this.client = new Client({
         partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
         intents: [
@@ -79,8 +72,6 @@ export class AppService implements OnApplicationBootstrap {
           status: 'online'
         }
       });
-
-      // TODO set to redis
 
       await this.client.login(process.env.discord);
       await this.bot();
@@ -103,21 +94,19 @@ export class AppService implements OnApplicationBootstrap {
         try {
           const guildBan = await ban.fetch();
 
-          /*
           const channelIDLogs = DISCORD_LOGS.get(guildBan.guild.id);
           const channel: Channel | null = await this.client.channels.fetch(channelIDLogs);
           if (channel) {
-            await (channel as TextChannel).send(`\` Banned: ${guildBan.user.username}#${guildBan.user.discriminator} \``);
-          }*/
+            await (channel as TextChannel).send(`${guildBan.user.id}`);
+          }
 
           if (guildBan.reason && DISCORD_BANS.has(guildBan.reason.toLowerCase())) {
-            if (!this.banList.has(guildBan.user.id)) {
-              this.banUserID = guildBan.user.id;
+            if (!await this.redisService.get(guildBan.user.id)) {
 
               const buttons = new MessageActionRow()
                 .addComponents(
                   new MessageButton()
-                    .setCustomId(this.banUserID)
+                    .setCustomId(guildBan.user.id)
                     .setLabel(`Ban ${guildBan.user.username}#${guildBan.user.discriminator}`)
                     .setStyle('DANGER')
                   ,
@@ -131,7 +120,7 @@ export class AppService implements OnApplicationBootstrap {
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
               const message = await this.channel.send({ embeds: [embed], components: [buttons] });
-              this.banList.set(guildBan.user.id, message.id);
+              await this.redisService.set(guildBan.user.id, message.id);
               setTimeout(() => message.delete(), this.timeout);
             }
           }
@@ -140,31 +129,31 @@ export class AppService implements OnApplicationBootstrap {
         }
       });
 
-      this.collector.on('collect', async (i) => {
-        console.log(i);
-        if (i.customId === this.banUserID) {
-          const discordServer: Snowflake = DISCORD_RELATIONS.get(i.user.id);
+      this.collector.on('collect', async (interaction) => {
 
+        if (!!await this.redisService.get(interaction.customId)) {
+          const discordServer: Snowflake = DISCORD_RELATIONS.get(interaction.user.id);
 
-/*          if (!discordServerAction.has(discordServer)) {
-            discordServerAction.add(discordServer);
+          const pressed = await this.redisService.smembers(`${interaction.customId}:button`);
 
+          if (!pressed.includes(discordServer)) {
+            await this.redisService.sadd(`${interaction.customId}:button`, discordServer);
 
-          }*/
+            const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(discordServer));
 
-          const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(discordServer));
+            const [embed] = interaction.message.embeds as MessageEmbed[];
+            const newEmbed = embed.addField('\u200B', `${emojiEdit} - ✅`, true);
 
-          const [embed] = i.message.embeds as MessageEmbed[];
-          const newEmbed = embed.addField('\u200B', `${emojiEdit} - ✅`, true);
-
-          await i.update({ embeds: [ newEmbed ] });
+            await interaction.update({ embeds: [ newEmbed ] });
+          }
         }
       });
 
       this.client.on('guildBanRemove', async (ban) => {
         try {
-          if (this.banList.has(ban.user.id)) {
-            this.banList.delete(ban.user.id);
+          if (!!await this.redisService.get(ban.user.id)) {
+            await this.redisService.del(ban.user.id);
+            await this.redisService.del(`${ban.user.id}:button`);
           }
         } catch (errorOrException) {
           this.logger.error(`guildBanRemove: ${errorOrException}`);
