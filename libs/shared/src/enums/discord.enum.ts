@@ -1,5 +1,4 @@
 export enum DISCORD_SERVERS_ENUM {
-  Test = '734001595049705534',
   SanctumOfLight = '210643527472906241',
   TempleOfFiveDawns = '217529277489479681',
   CrossClass = '474036493061718016',

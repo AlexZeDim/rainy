@@ -618,6 +618,11 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
+"@nestjs-modules/ioredis@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@nestjs-modules/ioredis/-/ioredis-1.0.0.tgz#4b2560f450047ea6cb044ebce5dd4363a24cc416"
+  integrity sha512-4y35a1VtNS3+RofrLWdPe9FiEhpji05wdgnkO97VUu9kxFe8y2Ck5UorRsu3dDzYn5BdumHg8kB9Qbb220gxSg==
+
 "@nestjs/cli@8.1.1":
   version "8.1.1"
   resolved "https://registry.npmjs.org/@nestjs/cli/-/cli-8.1.1.tgz"

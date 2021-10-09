@@ -1,10 +1,10 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   CROSS_CLASS_CHANNELS,
   DISCORD_BANS,
   DISCORD_EMOJI,
-  DISCORD_LOGS,
   DISCORD_RELATIONS,
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
@@ -19,7 +19,7 @@ import {
   ButtonInteraction,
   Snowflake,
   TextChannel,
-  Channel, CollectorFilter,
+  InteractionCollector,
 } from 'discord.js';
 
 @Injectable()
@@ -30,11 +30,15 @@ export class AppService implements OnApplicationBootstrap {
 
   private timeout: number = 1000 * 60 * 60 * 12;
 
-  private banList: Map<Snowflake, Snowflake> = new Map([]);
+  // private banList: Map<Snowflake, Snowflake> = new Map([]);
+
+  private channel: TextChannel;
+
+  private collector: InteractionCollector<ButtonInteraction>;
 
   private filterBan = async (interaction: ButtonInteraction): Promise<boolean> => {
     try {
-      console.log(interaction);
+      // console.log(interaction);
       // TODO array, set or something like that
       if (this.banList.has(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
         const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
@@ -55,6 +59,11 @@ export class AppService implements OnApplicationBootstrap {
     AppService.name, { timestamp: true },
   );
 
+  constructor(
+    @InjectRedis()
+    private readonly redisService: Redis,
+  ) {}
+
   async onApplicationBootstrap(): Promise<void> {
     try {
       this.client = new Client({
@@ -70,6 +79,9 @@ export class AppService implements OnApplicationBootstrap {
           status: 'online'
         }
       });
+
+      // TODO set to redis
+
       await this.client.login(process.env.discord);
       await this.bot();
     } catch (errorOrException) {
@@ -79,20 +91,13 @@ export class AppService implements OnApplicationBootstrap {
 
   async bot(): Promise<void> {
     try {
-      this.client.on('ready', async () =>
-        this.logger.log(`Logged in as ${this.client.user.tag}!`)
-      )
+      this.client.on('ready', async () => this.logger.log(`Logged in as ${this.client.user.tag}!`))
 
-      this.client.on('messageCreate', async (message) => {
-        if (message.author.bot) return;
+      const channel = await this.client.channels.fetch(CROSS_CLASS_CHANNELS.BanThread);
+      if (!channel || channel.type !== 'GUILD_TEXT') return;
 
-        if (message.guildId === DISCORD_SERVERS_ENUM.SanctumOfLight) {
-          const guildMember = message.guild.members.cache.get(message.author.id);
-          if (!guildMember.roles.cache.has(PALADIN_ROLES.PaladinMember)) {
-            await guildMember.roles.add(PALADIN_ROLES.PaladinMember);
-          }
-        }
-      });
+      this.channel = channel as TextChannel;
+      this.collector = this.channel.createMessageComponentCollector({ filter: this.filterBan });
 
       this.client.on('guildBanAdd', async (ban) => {
         try {
@@ -109,10 +114,6 @@ export class AppService implements OnApplicationBootstrap {
             if (!this.banList.has(guildBan.user.id)) {
               this.banUserID = guildBan.user.id;
 
-              // TODO move to this.
-              const channel: Channel | null = await this.client.channels.fetch(CROSS_CLASS_CHANNELS.BanThread);
-              if (!channel || channel.type !== 'GUILD_TEXT') return;
-
               const buttons = new MessageActionRow()
                 .addComponents(
                   new MessageButton()
@@ -122,10 +123,6 @@ export class AppService implements OnApplicationBootstrap {
                   ,
                 );
 
-              const collector = (channel as TextChannel).createMessageComponentCollector({ filter: this.filterBan, time: this.timeout });
-
-              this.banList.set(guildBan.user.id, channel.id);
-
               const emoji = this.client.emojis.cache.get(DISCORD_EMOJI.get(guildBan.guild.id));
 
               const embed =
@@ -133,29 +130,34 @@ export class AppService implements OnApplicationBootstrap {
                   .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\n\nЗаблокирован на:`)
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
-              const discordServerAction: Set<Snowflake> = new Set();
-
-              collector.on('collect', async (i) => {
-                if (i.customId === this.banUserID) {
-                  const discordServer: Snowflake = DISCORD_RELATIONS.get(i.user.id);
-
-                  if (!discordServerAction.has(discordServer)) {
-                    discordServerAction.add(discordServer);
-
-                    const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(discordServer));
-                    const newEmbed = embed.addField('\u200B', `${emojiEdit} - ✅`, true);
-
-                    await i.update({ embeds: [ newEmbed ] });
-                  }
-                }
-              });
-
-              const message = await (channel as TextChannel).send({ embeds: [embed], components: [buttons] });
+              const message = await this.channel.send({ embeds: [embed], components: [buttons] });
+              this.banList.set(guildBan.user.id, message.id);
               setTimeout(() => message.delete(), this.timeout);
             }
           }
         } catch (errorOrException) {
           this.logger.error(`guildBanAdd: ${errorOrException}`);
+        }
+      });
+
+      this.collector.on('collect', async (i) => {
+        console.log(i);
+        if (i.customId === this.banUserID) {
+          const discordServer: Snowflake = DISCORD_RELATIONS.get(i.user.id);
+
+
+/*          if (!discordServerAction.has(discordServer)) {
+            discordServerAction.add(discordServer);
+
+
+          }*/
+
+          const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(discordServer));
+
+          const [embed] = i.message.embeds as MessageEmbed[];
+          const newEmbed = embed.addField('\u200B', `${emojiEdit} - ✅`, true);
+
+          await i.update({ embeds: [ newEmbed ] });
         }
       });
 
