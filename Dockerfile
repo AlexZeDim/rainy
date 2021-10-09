@@ -4,9 +4,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN yarn install glob rimraf webpack
+RUN yarn add glob rimraf webpack
 
-RUN yarn install --only=development
+RUN yarn add --only=development
 
 COPY . .
 
@@ -21,7 +21,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN yarn install --only=production
+RUN yarn add --only=production
 
 COPY . .
 
