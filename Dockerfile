@@ -6,7 +6,7 @@ COPY package*.json ./
 
 RUN yarn add glob rimraf webpack
 
-RUN yarn add --only=development
+RUN npm install --only=development
 
 COPY . .
 
@@ -21,7 +21,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN yarn run --only=production
+RUN npm install --only=production
 
 COPY . .
 
