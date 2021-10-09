@@ -21,7 +21,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN yarn add --only=production
+RUN yarn run --only=production
 
 COPY . .
 
