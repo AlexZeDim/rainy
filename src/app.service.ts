@@ -116,7 +116,7 @@ export class AppService implements OnApplicationBootstrap {
 
               const embed =
                 new MessageEmbed()
-                  .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\n\nЗаблокирован на:`)
+                  .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\nID пользователя: ${guildBan.user.id}\n\nЗаблокирован на:`)
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
               const message = await this.channel.send({ embeds: [embed], components: [buttons] });
