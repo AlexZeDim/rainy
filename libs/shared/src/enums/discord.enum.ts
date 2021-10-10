@@ -11,6 +11,7 @@ export enum DISCORD_SERVERS_ENUM {
   HallOfTheGuardian = '212664465181769728',
   SkyholdCitadel = '217528830418616322',
   TempleOfVoidLight = '888098294662848543',
+  HallOfShadows = '217529023838814208',
 }
 
 export enum DISCORD_SERVER_RENAME_ENUM {
@@ -42,6 +43,9 @@ export enum DISCORD_LOGS_ENUM {
 }
 
 export enum DISCORD_AUTHORIZED_ENUM {
+  // Rogue
+  Darkcat = '105654482540486656',
+  Lowiq = '258654779104821248',
   // Shaman
   Amani = '158715861362802689',
   Orenji = '520691292758474752',

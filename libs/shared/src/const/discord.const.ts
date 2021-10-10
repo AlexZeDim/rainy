@@ -1,7 +1,8 @@
 import { Snowflake } from "discord.js";
 import {
   DISCORD_AUTHORIZED_ENUM,
-  DISCORD_BAN_REASON_ENUM, DISCORD_LOGS_ENUM,
+  DISCORD_BAN_REASON_ENUM,
+  DISCORD_LOGS_ENUM,
   DISCORD_SERVER_RENAME_ENUM,
   DISCORD_SERVERS_ENUM
 } from "@app/shared/enums";
@@ -55,6 +56,8 @@ export const DISCORD_RELATIONS: Map<string, string> = new Map([
   [DISCORD_AUTHORIZED_ENUM.Yadder, DISCORD_SERVERS_ENUM.SkyholdCitadel],
   [DISCORD_AUTHORIZED_ENUM.Enmerkar, DISCORD_SERVERS_ENUM.TempleOfVoidLight],
   [DISCORD_AUTHORIZED_ENUM.Restar, DISCORD_SERVERS_ENUM.TempleOfVoidLight],
+  [DISCORD_AUTHORIZED_ENUM.Lowiq, DISCORD_SERVERS_ENUM.HallOfShadows],
+  [DISCORD_AUTHORIZED_ENUM.Darkcat, DISCORD_SERVERS_ENUM.HallOfShadows],
 ]);
 
 export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(Object.values(DISCORD_SERVER_RENAME_ENUM));
