@@ -19,6 +19,7 @@ import {
   TextChannel,
   InteractionCollector, Channel,
 } from 'discord.js';
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -58,7 +59,7 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
-      await this.redisService.flushall();
+      // await this.redisService.flushall();
       this.client = new Client({
         partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
         intents: [
@@ -77,6 +78,27 @@ export class AppService implements OnApplicationBootstrap {
       await this.bot();
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  private async rename(): Promise<void> {
+    try {
+      switch (this.client.user.username) {
+        case 'Rainy':
+          await this.client.user.setUsername('Janisse');
+          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/monk_logo.png');
+          break;
+        case 'Janisse':
+          await this.client.user.setUsername('Rainy');
+          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
+          break;
+        default:
+          await this.client.user.setUsername('Rainy');
+          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
+      }
+    } catch (errorOrException) {
+      this.logger.error(`rename: ${errorOrException}`);
     }
   }
 
