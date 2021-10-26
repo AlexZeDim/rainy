@@ -84,7 +84,7 @@ export class AppService implements OnApplicationBootstrap {
   @Cron(CronExpression.EVERY_HOUR)
   private async rename(): Promise<void> {
     try {
-      this.logger.log(`Rename bot from ${this.client.user.username}`);
+      this.logger.log(`Rename bot from ${this.client.user.username}`)
       switch (this.client.user.username) {
         case 'Rainy':
           await this.client.user.setUsername('Janisse');
