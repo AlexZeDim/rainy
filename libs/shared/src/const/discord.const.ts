@@ -19,6 +19,7 @@ export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.HallOfTheGuardian, '741997711955460116'],
   [DISCORD_SERVERS_ENUM.SkyholdCitadel, '741997711775236127'],
   [DISCORD_SERVERS_ENUM.TempleOfVoidLight, '741997711854665798'],
+  [DISCORD_SERVERS_ENUM.HallOfShadows, '741997712198860870']
 ]);
 
 export const DISCORD_LOGS: Map<Snowflake, Snowflake> = new Map([
