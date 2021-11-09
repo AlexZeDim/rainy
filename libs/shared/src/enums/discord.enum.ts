@@ -34,14 +34,6 @@ export enum DISCORD_BAN_REASON_ENUM {
   trash_ru = 'мусор',
 }
 
-export enum DISCORD_LOGS_ENUM {
-  Paladin = '896513694488477767',
-  Mage = '896513703833378836',
-  Shaman = '896516506047889419',
-  Monk = '896516506047889419',
-  Druid = '896513678231343144',
-}
-
 export enum DISCORD_AUTHORIZED_ENUM {
   // Rogue
   Darkcat = '105654482540486656',

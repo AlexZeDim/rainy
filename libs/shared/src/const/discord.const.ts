@@ -2,7 +2,6 @@ import { Snowflake } from "discord.js";
 import {
   DISCORD_AUTHORIZED_ENUM,
   DISCORD_BAN_REASON_ENUM,
-  DISCORD_LOGS_ENUM,
   DISCORD_SERVER_RENAME_ENUM,
   DISCORD_SERVERS_ENUM
 } from "@app/shared/enums";
@@ -20,14 +19,6 @@ export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.SkyholdCitadel, '741997711775236127'],
   [DISCORD_SERVERS_ENUM.TempleOfVoidLight, '741997711854665798'],
   [DISCORD_SERVERS_ENUM.HallOfShadows, '741997712198860870']
-]);
-
-export const DISCORD_LOGS: Map<Snowflake, Snowflake> = new Map([
-  [DISCORD_SERVERS_ENUM.SanctumOfLight, DISCORD_LOGS_ENUM.Paladin],
-  [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, DISCORD_LOGS_ENUM.Monk],
-  [DISCORD_SERVERS_ENUM.Maelstorm, DISCORD_LOGS_ENUM.Shaman],
-  [DISCORD_SERVERS_ENUM.HallOfTheGuardian, DISCORD_LOGS_ENUM.Mage],
-  [DISCORD_SERVERS_ENUM.DreamGroove, DISCORD_LOGS_ENUM.Druid],
 ]);
 
 export const DISCORD_RELATIONS: Map<string, string> = new Map([
@@ -64,3 +55,5 @@ export const DISCORD_RELATIONS: Map<string, string> = new Map([
 export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(Object.values(DISCORD_SERVER_RENAME_ENUM));
 
 export const DISCORD_BANS: Set<string> = new Set(Object.values(DISCORD_BAN_REASON_ENUM));
+
+export const DISCORD_LOGS: Snowflake = '896513694488477767';
