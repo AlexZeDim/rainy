@@ -59,6 +59,7 @@ export enum DISCORD_AUTHORIZED_ENUM {
   // Demon Hunter
   Amuress = '421002046997659649',
   Rodrig = '211007313476059136',
+  Sangreal = '119867388861743104',
   // Mages
   Akula = '206158108731506689',
   Annet = '200320423265697792',
