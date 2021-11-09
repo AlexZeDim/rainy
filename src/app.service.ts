@@ -4,7 +4,8 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   CROSS_CLASS_CHANNELS,
   DISCORD_BANS,
-  DISCORD_EMOJI, DISCORD_LOGS,
+  DISCORD_EMOJI,
+  DISCORD_LOGS,
   DISCORD_RELATIONS,
   DISCORD_SERVER_RENAME,
 } from '@app/shared';
@@ -59,7 +60,7 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
-      // await this.redisService.flushall();
+      // FIXME await this.redisService.flushall();
       this.client = new Client({
         partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
         intents: [
@@ -117,20 +118,21 @@ export class AppService implements OnApplicationBootstrap {
         try {
           const guildBan = await ban.fetch();
 
-          const channelIDLogs = DISCORD_LOGS.get(guildBan.guild.id);
-          const channel: Channel | null = await this.client.channels.fetch(channelIDLogs);
-          if (channel) {
-            await (channel as TextChannel).send(`${guildBan.user.id}`);
-          }
-
           if (guildBan.reason && DISCORD_BANS.has(guildBan.reason.toLowerCase())) {
+
+            const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(guildBan.guild.id));
+            const channel: Channel | null = await this.client.channels.fetch(DISCORD_LOGS);
+            if (channel) {
+              await (channel as TextChannel).send(`${guildBan.user.id} - ${emojiEdit} ${guildBan.guild.name}`);
+            }
+
             if (!await this.redisService.get(guildBan.user.id)) {
 
               const buttons = new MessageActionRow()
                 .addComponents(
                   new MessageButton()
                     .setCustomId(guildBan.user.id)
-                    .setLabel(`Ban ${guildBan.user.username}#${guildBan.user.discriminator}`)
+                    .setLabel('Ban')
                     .setStyle('DANGER')
                   ,
                 );
@@ -139,10 +141,10 @@ export class AppService implements OnApplicationBootstrap {
 
               const embed =
                 new MessageEmbed()
-                  .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\nID пользователя: ${guildBan.user.id}\n\nЗаблокирован на:`)
+                  .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\nИмя пользователя: ${guildBan.user.username}#${guildBan.user.discriminator}\n\nЗаблокирован на:`)
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
-              const message = await this.channel.send({ embeds: [embed], components: [buttons] });
+              const message = await this.channel.send({ content: `ID пользователя: ${guildBan.user.id}`, embeds: [embed], components: [buttons] });
               await this.redisService.set(guildBan.user.id, message.id);
               setTimeout(() => message.delete(), this.timeout);
             }
