@@ -33,7 +33,7 @@
     "@nestjs/schedule": "1.0.1",
     "discord.js": "13.1.0",
     "ioredis": "4.27.1",
-    "normalize-text": "2.3.2",
+    "normalize-text": "2.3.3",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
     "rxjs": "7.3.0"

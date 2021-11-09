@@ -685,7 +685,7 @@
     multer "1.4.2"
     tslib "2.3.0"
 
-"@nestjs/schedule@^1.0.1":
+"@nestjs/schedule@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@nestjs/schedule/-/schedule-1.0.1.tgz#4ab3f753c2a0f606cf969b0ec7aa4e655ea444d3"
   integrity sha512-EU2tB4rxuEgum8JlorAFvXkU982EYZm/IBa7n6kgkyps5BbxQSFf7iR1CLkP9zODO9ApZTWk5z3q9L3O7vrkoQ==
@@ -3845,10 +3845,10 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-normalize-text@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.npmjs.org/normalize-text/-/normalize-text-2.3.2.tgz"
-  integrity sha512-Fx6aBqYLlVLQEV6h0ejhPqaF1vUPI+yIxU7uYtb5rPu+WzRr7KypJKGJFdbSIZpC+ELiiCut/WGU3QDCFff1EA==
+normalize-text@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/normalize-text/-/normalize-text-2.3.3.tgz#799763ef13a7bf1f87697eba3a662202f0a34b80"
+  integrity sha512-LR9nmMC2TIJ9eAJsxvF3ySroXtLFEQrO+ByQBLg/eLslTdY2iId8GvTp7Ggj/RL2wz6nv1d8gGuB6DhmaKEqUA==
   dependencies:
     "@bitty/pipe" "^0.2.1"
 
