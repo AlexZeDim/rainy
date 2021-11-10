@@ -2,9 +2,8 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
-  CROSS_CLASS_CHANNELS,
-  DISCORD_BANS,
-  DISCORD_CHANNELS_PROTECTS,
+  DISCORD_BANS, DISCORD_CHANNELS,
+  DISCORD_CHANNELS_PROTECT,
   DISCORD_CROSS_CHAT_BOT,
   DISCORD_EMOJI,
   DISCORD_LOGS,
@@ -21,7 +20,9 @@ import {
   ButtonInteraction,
   Snowflake,
   TextChannel,
-  InteractionCollector, Channel,
+  InteractionCollector,
+  Channel,
+  Permissions,
 } from 'discord.js';
 import { Cron, CronExpression } from "@nestjs/schedule";
 
@@ -85,7 +86,7 @@ export class AppService implements OnApplicationBootstrap {
     }
   }
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_2_HOURS)
   private async rename(): Promise<void> {
     try {
       this.logger.log(`Rename bot from ${this.client.user.username}`)
@@ -111,7 +112,7 @@ export class AppService implements OnApplicationBootstrap {
     try {
       this.client.on('ready', async () => this.logger.log(`Logged in as ${this.client.user.tag}!`))
 
-      const channel = await this.client.channels.fetch(CROSS_CLASS_CHANNELS.BanThread);
+      const channel = await this.client.channels.fetch(DISCORD_CHANNELS.CrossChat_BanThread);
       if (!channel || channel.type !== 'GUILD_TEXT') return;
 
       this.channel = channel as TextChannel;
@@ -119,14 +120,16 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on('messageCreate', async(message) => {
         try {
+
           if (
             DISCORD_SERVER_PROTECT.has(message.guildId)
-            && DISCORD_CHANNELS_PROTECTS.has(message.channelId)
-            && message.guild.me.permissions.has('MANAGE_MESSAGES', false)
+            && DISCORD_CHANNELS_PROTECT.has(message.channelId)
+            && message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES, false)
           ) {
+
             if (
               message.author.id === DISCORD_CROSS_CHAT_BOT
-              && message.embeds.length > 0
+              && message.embeds.length
             ) {
               const [embedMessage] = message.embeds;
 

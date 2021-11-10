@@ -19,10 +19,6 @@ export enum DISCORD_SERVER_RENAME_ENUM {
   SanctumOfLight = '210643527472906241',
 }
 
-export enum CROSS_CLASS_CHANNELS {
-  BanThread = '895301502485270618'
-}
-
 export enum DISCORD_BAN_REASON_ENUM {
   spam_en = 'spam',
   spam_ru = 'спам',
@@ -77,20 +73,19 @@ export enum DISCORD_AUTHORIZED_ENUM {
   Mizzrim = '213321046273556481',
 }
 
-export enum PALADIN_CHANNELS {
-  BanThread = '276274841428951040',
-  CrossAddons = '425243919530590209',
-}
-
-export enum PALADIN_ROLES {
+export enum DISCORD_ROLES {
   PaladinMember = '886198703495475220'
 }
 
-export enum MONK_CHANNELS {
-  CrossAddons = '276274841428951040'
+export enum DISCORD_CHANNELS {
+  CrossChat_BanThread = '895301502485270618',
+  Mage_CrossAddons = '425733622427942922',
+  Monk_CrossAddons = '425566534350405654',
+  Paladin_CrossAddons = '425243919530590209',
+  Druid_CrossAddons = '426146087217266689',
+  Druid_CrossChat = '425328722258952194',
+  Priest_CrossChat = '891025625106776124',
+  Priest_CrossAddons = '891027804928475217',
+  Rogue_CrossChat = '425214451839402004',
+  Rogue_CrossAddons = '425569744075227136',
 }
-
-export enum MAGE_CHANNELS {
-  CrossAddons = '425733622427942922'
-}
-
