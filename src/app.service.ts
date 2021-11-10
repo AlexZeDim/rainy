@@ -172,10 +172,10 @@ export class AppService implements OnApplicationBootstrap {
 
               const embed =
                 new MessageEmbed()
-                  .setDescription(`Источник: ${emoji} **${guildBan.guild.name}**\nИмя пользователя: ${guildBan.user.username}#${guildBan.user.discriminator}\n\nЗаблокирован на:`)
+                  .setDescription(`**${guildBan.user.username}#${guildBan.user.discriminator}** заблокирован на:`)
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
-              const message = await this.channel.send({ content: `ID пользователя: ${guildBan.user.id}`, embeds: [embed], components: [buttons] });
+              const message = await this.channel.send({ content: `!ban ${guildBan.user.id} CrossBan`, embeds: [embed], components: [buttons] });
               await this.redisService.set(guildBan.user.id, message.id);
               setTimeout(() => message.delete(), this.timeout);
             }
