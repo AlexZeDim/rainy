@@ -1,6 +1,6 @@
 # Rainy
 
-Rainy was born as a small discord bot, that handles only one problem, it renames every user on join event. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft. But sometimes is may be known as `Janisse` in the name of l
+Rainy was born as a small discord bot, that handles only one problem, it renames every user on join event. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft. But sometimes is may be known as `Janisse` in the name of co-owner of Monk Discord.
 
 ## Permissions
 
