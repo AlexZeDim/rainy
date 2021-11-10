@@ -60,7 +60,8 @@ export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(Object.values(DISCO
 
 export const DISCORD_SERVER_PROTECT: Set<Snowflake> = new Set([
   DISCORD_SERVERS_ENUM.SanctumOfLight,
-  DISCORD_SERVERS_ENUM.TempleOfFiveDawns
+  DISCORD_SERVERS_ENUM.TempleOfFiveDawns,
+  DISCORD_SERVERS_ENUM.HallOfTheGuardian
 ]);
 
 export const DISCORD_CHANNELS_PROTECTS: Set<Snowflake> = new Set([
