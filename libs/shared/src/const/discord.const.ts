@@ -3,7 +3,10 @@ import {
   DISCORD_AUTHORIZED_ENUM,
   DISCORD_BAN_REASON_ENUM,
   DISCORD_SERVER_RENAME_ENUM,
-  DISCORD_SERVERS_ENUM
+  DISCORD_SERVERS_ENUM,
+  MAGE_CHANNELS,
+  MONK_CHANNELS,
+  PALADIN_CHANNELS
 } from "@app/shared/enums";
 
 export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
@@ -54,6 +57,19 @@ export const DISCORD_RELATIONS: Map<string, string> = new Map([
 ]);
 
 export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(Object.values(DISCORD_SERVER_RENAME_ENUM));
+
+export const DISCORD_SERVER_PROTECT: Set<Snowflake> = new Set([
+  DISCORD_SERVERS_ENUM.SanctumOfLight,
+  DISCORD_SERVERS_ENUM.TempleOfFiveDawns
+]);
+
+export const DISCORD_CHANNELS_PROTECTS: Set<Snowflake> = new Set([
+  MONK_CHANNELS.CrossAddons,
+  PALADIN_CHANNELS.CrossAddons,
+  MAGE_CHANNELS.CrossAddons,
+]);
+
+export const DISCORD_CROSS_CHAT_BOT: Snowflake = '891021899172286555';
 
 export const DISCORD_BANS: Set<string> = new Set(Object.values(DISCORD_BAN_REASON_ENUM));
 

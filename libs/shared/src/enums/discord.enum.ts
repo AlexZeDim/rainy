@@ -78,9 +78,19 @@ export enum DISCORD_AUTHORIZED_ENUM {
 }
 
 export enum PALADIN_CHANNELS {
-  BanThread = '276274841428951040'
+  BanThread = '276274841428951040',
+  CrossAddons = '425243919530590209',
 }
 
 export enum PALADIN_ROLES {
   PaladinMember = '886198703495475220'
 }
+
+export enum MONK_CHANNELS {
+  CrossAddons = '276274841428951040'
+}
+
+export enum MAGE_CHANNELS {
+  CrossAddons = '425733622427942922'
+}
+

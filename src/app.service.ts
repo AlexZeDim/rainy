@@ -4,9 +4,12 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   CROSS_CLASS_CHANNELS,
   DISCORD_BANS,
+  DISCORD_CHANNELS_PROTECTS,
+  DISCORD_CROSS_CHAT_BOT,
   DISCORD_EMOJI,
   DISCORD_LOGS,
   DISCORD_RELATIONS,
+  DISCORD_SERVER_PROTECT,
   DISCORD_SERVER_RENAME,
 } from '@app/shared';
 import {
@@ -113,6 +116,30 @@ export class AppService implements OnApplicationBootstrap {
 
       this.channel = channel as TextChannel;
       this.collector = this.channel.createMessageComponentCollector({ filter: this.filterBan });
+
+      this.client.on('messageCreate', async(message) => {
+        try {
+          if (
+            DISCORD_SERVER_PROTECT.has(message.guildId)
+            && DISCORD_CHANNELS_PROTECTS.has(message.channelId)
+          ) {
+            if (
+              message.author.id === DISCORD_CROSS_CHAT_BOT
+              && message.embeds.length > 0
+            ) {
+              const [embedMessage] = message.embeds;
+
+              if (embedMessage.description.includes('@here') || embedMessage.description.includes('@everyone')) {
+                await message.delete();
+              }
+            } else if (message.mentions.everyone) {
+              await message.delete();
+            }
+          }
+        } catch (errorOrException) {
+          this.logger.error(`messageCreate: ${errorOrException}`);
+        }
+      });
 
       this.client.on('guildBanAdd', async (ban) => {
         try {
