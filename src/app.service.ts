@@ -119,12 +119,10 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on('messageCreate', async(message) => {
         try {
-          const selfPermissions = message.guild.me.permissions.has('MANAGE_MESSAGES', false);
-
           if (
             DISCORD_SERVER_PROTECT.has(message.guildId)
             && DISCORD_CHANNELS_PROTECTS.has(message.channelId)
-            && selfPermissions
+            && message.guild.me.permissions.has('MANAGE_MESSAGES', false)
           ) {
             if (
               message.author.id === DISCORD_CROSS_CHAT_BOT
