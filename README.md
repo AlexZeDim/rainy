@@ -1,19 +1,13 @@
 # Rainy
 
-Rainy is a small discord bot, that handles only one problem, it renames every user on join event, removing from nickname all:
+Rainy was born as a small discord bot, that handles only one problem, it renames every user on join event, removing from nickname all:
 
- - special characters
- - spaces
- - diacritic symbols
- - numbers
- 
-If username has been trimmed to empty space, then bot rename user to *Recruit*.
- 
-Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.gg/yAhvHbM) discord community for paladin players in World of Warcraft.
+But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft. But sometimes is may be known as `Janisse` in the name of l
 
 ## Permissions
 
-Rainy needs `rename user` permissions and the most top role above all others. It doesn't need admin or any other special permissions. But anyway, since the code is open-sourced you could give to the bot any permissions and it won't abuse it.
+Rainy needs `rename user` permission and the most top (literally) upper-bottom placed role above all others. It doesn't need an `administrator` title or any other special permissions. But anyway, since the code is open-sourced you could give to the bot any permissions and make sure that it won't abuse it.
+
 If bot doesn't rename the user, well, mainly because lack of permissions.
 
 
@@ -21,6 +15,27 @@ If bot doesn't rename the user, well, mainly because lack of permissions.
 
 If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free to use.
 
-## I have found a bug or say want to say «Thank you», what should I do?
 
-You post an issue in this repo, or DM me via Discord, my tag is: `AlexZeDim#2645`. I am open to anyone, even w/o friend request.
+## Contributon & Issues policy.
+
+We are very glad to hear any relevant proposal or any kinf of contribution from you. 
+
+ - Have you found a bug? Feel free to make an issue about it [here](https://github.com/AlexZeDim/rainy/issues)
+ - If you want to contribute your code, just for the repo and make a PR. We are using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) in description so take it as guide-line.
+ - Do you have more questions? Jump in to our [Wiki](https://github.com/AlexZeDim/rainy/wiki/)
+
+
+
+## Deployment
+
+1. Clone the repository with `git clone` or download the code.
+2. Create a `.env` file with the following content:
+
+```
+discord=your_token
+redis=_your_redis
+port=your_port
+```
+3. Install all dependecies `npm install` or `yarn`.
+4. Create docker image with `npm run docker:build` command.
+
