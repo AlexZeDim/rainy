@@ -133,10 +133,17 @@ export class AppService implements OnApplicationBootstrap {
             ) {
               const [embedMessage] = message.embeds;
 
-              if (embedMessage.description.includes('@here') || embedMessage.description.includes('@everyone')) {
+              if (
+                embedMessage.description.includes('@here')
+                || embedMessage.description.includes('@everyone')
+                || embedMessage.description.includes('бесплатно')
+                || embedMessage.description.includes('нитро')
+              ) {
                 await message.delete();
               }
             } else if (message.mentions.everyone) {
+              await message.delete();
+            } else if (message.content.includes('нитро')) {
               await message.delete();
             }
           }
