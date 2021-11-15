@@ -52,6 +52,9 @@ export enum DISCORD_AUTHORIZED_ENUM {
   // Monk
   Nims = '176208064217743361',
   Jarisse = '425046052597661697',
+  Collidus = '272697370393706497',
+  MonkNikita = '204617891411263488',
+  Openal = '777945956132978758',
   // Demon Hunter
   Amuress = '421002046997659649',
   Rodrig = '211007313476059136',
