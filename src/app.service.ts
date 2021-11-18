@@ -86,28 +86,6 @@ export class AppService implements OnApplicationBootstrap {
     }
   }
 
-  @Cron(CronExpression.EVERY_2_HOURS)
-  private async rename(): Promise<void> {
-    try {
-      this.logger.log(`Rename bot from ${this.client.user.username}`)
-      switch (this.client.user.username) {
-        case 'Rainy':
-          await this.client.user.setUsername('Janisse');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/monk_logo.png');
-          break;
-        case 'Janisse':
-          await this.client.user.setUsername('Rainy');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
-          break;
-        default:
-          await this.client.user.setUsername('Rainy');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
-      }
-    } catch (errorOrException) {
-      this.logger.error(`rename: ${errorOrException}`);
-    }
-  }
-
   async bot(): Promise<void> {
     try {
       this.client.on('ready', async () => this.logger.log(`Logged in as ${this.client.user.tag}!`))
