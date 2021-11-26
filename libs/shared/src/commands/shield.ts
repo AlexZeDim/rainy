@@ -1,8 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ISlashCommandArgs } from "@app/shared/interface";
 
-module.exports = {
+export const Shield = {
   name: 'shield',
+  description: 'This command server threshold for incoming members',
   guildOnly: true,
   slashCommand: new SlashCommandBuilder()
     .setName('shield')

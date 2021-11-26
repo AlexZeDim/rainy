@@ -4,8 +4,6 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import ms from 'ms';
-import path from 'path';
-import * as fs from 'fs';
 import {
   DISCORD_BAN_REASON_ENUM,
   DISCORD_BANS, DISCORD_CHANNELS,
@@ -16,6 +14,7 @@ import {
   DISCORD_RELATIONS,
   DISCORD_SERVER_PROTECT,
   DISCORD_SERVER_RENAME,
+  Shield,
 } from '@app/shared';
 import {
   Intents,
@@ -29,7 +28,7 @@ import {
   InteractionCollector,
   Channel,
   Permissions,
-  Collection,
+  Collection, Interaction,
 } from 'discord.js';
 
 
@@ -108,15 +107,8 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private loadCommands(): void {
-    const commandFiles = fs
-      .readdirSync(path.join(`${__dirname}`, '..', 'libs/shared/src/commands/'))
-      .filter(file => file.endsWith('.ts'));
-
-    for (const file of commandFiles) {
-      const command = require(path.join(`${__dirname}`, '..', `libs/shared/src/commands/${file}`));
-      this.commandsMessage.set(command.name, command);
-      this.commandSlash.push(command.slashCommand.toJSON());
-    }
+    this.commandsMessage.set(Shield.name, Shield);
+    this.commandSlash.push(Shield.slashCommand.toJSON());
   }
 
   async bot(): Promise<void> {
@@ -128,6 +120,20 @@ export class AppService implements OnApplicationBootstrap {
 
       this.channel = channel as TextChannel;
       this.collector = this.channel.createMessageComponentCollector({ filter: this.filterBan });
+
+      this.client.on('interactionCreate', async (interaction: Interaction): Promise<void> => {
+        if (!interaction.isCommand()) return;
+
+        const command = this.commandsMessage.get(interaction.commandName);
+        if (!command) return;
+
+        try {
+          await command.executeInteraction({ interaction, redis: this.redisService });
+        } catch (errorException) {
+          this.logger.error(errorException);
+          await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
+      });
 
       this.client.on('messageCreate', async(message) => {
         try {
