@@ -10,7 +10,7 @@ RUN yarn --only=development
 
 COPY . .
 
-RUN yarn run build
+RUN yarn run build --openssl-legacy-provider
 
 FROM node:17.1-alpine3.12 as production
 
