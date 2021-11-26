@@ -15,6 +15,7 @@ RUN yarn run build
 FROM node:17.1-alpine3.12 as production
 
 ARG NODE_ENV=production
+ARG NODE_OPTIONS=--openssl-legacy-provider
 ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
