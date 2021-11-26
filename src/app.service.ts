@@ -113,7 +113,7 @@ export class AppService implements OnApplicationBootstrap {
       .filter(file => file.endsWith('.ts'));
 
     for (const file of commandFiles) {
-      const command = require(`./commands/${file}`); // Command interface
+      const command = require(path.join(`${__dirname}`, '..', `libs/shared/src/commands/${file}`));
       this.commandsMessage.set(command.name, command);
       this.commandSlash.push(command.slashCommand.toJSON());
     }

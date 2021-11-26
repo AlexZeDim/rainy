@@ -5,13 +5,17 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
-    "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
+    "lib": [
+      "ES2020"
+    ],
+    "target": "es2020",
     "skipLibCheck": true,
+    "sourceMap": true,
     "paths": {
       "@app/shared": [
         "libs/shared/src"
