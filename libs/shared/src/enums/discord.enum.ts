@@ -28,6 +28,8 @@ export enum DISCORD_BAN_REASON_ENUM {
   scam_ru = 'скам',
   trash_en = 'trash',
   trash_ru = 'мусор',
+  shield_ru = 'щит',
+  shield_en = 'shield',
 }
 
 export enum DISCORD_AUTHORIZED_ENUM {

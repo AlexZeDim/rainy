@@ -1,7 +1,13 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import ms from 'ms';
+import path from 'path';
+import * as fs from 'fs';
 import {
+  DISCORD_BAN_REASON_ENUM,
   DISCORD_BANS, DISCORD_CHANNELS,
   DISCORD_CHANNELS_PROTECT,
   DISCORD_CROSS_CHAT_BOT,
@@ -23,8 +29,9 @@ import {
   InteractionCollector,
   Channel,
   Permissions,
+  Collection,
 } from 'discord.js';
-import { Cron, CronExpression } from "@nestjs/schedule";
+
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -35,6 +42,12 @@ export class AppService implements OnApplicationBootstrap {
   private channel: TextChannel;
 
   private collector: InteractionCollector<ButtonInteraction>;
+
+  private commandsMessage: Collection<string, any> = new Collection();
+
+  private commandSlash = [];
+
+  private readonly rest = new REST({ version: '9' }).setToken(process.env.discord);
 
   private readonly logger = new Logger(
     AppService.name, { timestamp: true },
@@ -64,6 +77,8 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
+      this.loadCommands();
+
       // FIXME await this.redisService.flushall();
       this.client = new Client({
         partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
@@ -80,31 +95,27 @@ export class AppService implements OnApplicationBootstrap {
       });
 
       await this.client.login(process.env.discord);
+
+      await this.rest.put(
+        Routes.applicationCommands(this.client.user.id), // TODO user ID probably fix
+        { body: this.commandSlash },
+      );
+
       await this.bot();
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
     }
   }
 
-  @Cron(CronExpression.EVERY_2_HOURS)
-  private async rename(): Promise<void> {
-    try {
-      this.logger.log(`Rename bot from ${this.client.user.username}`)
-      switch (this.client.user.username) {
-        case 'Rainy':
-          await this.client.user.setUsername('Janisse');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/monk_logo.png');
-          break;
-        case 'Janisse':
-          await this.client.user.setUsername('Rainy');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
-          break;
-        default:
-          await this.client.user.setUsername('Rainy');
-          await this.client.user.setAvatar('https://raw.githubusercontent.com/AlexZeDim/rainy/master/rainy_logo.png');
-      }
-    } catch (errorOrException) {
-      this.logger.error(`rename: ${errorOrException}`);
+  private loadCommands(): void {
+    const commandFiles = fs
+      .readdirSync(path.join(`${__dirname}`, '..', '..', '..', 'apps/discord/libs/shared/commands/'))
+      .filter(file => file.endsWith('.ts'));
+
+    for (const file of commandFiles) {
+      const command = require(`./commands/${file}`); // Command interface
+      this.commandsMessage.set(command.name, command);
+      this.commandSlash.push(command.slashCommand.toJSON());
     }
   }
 
@@ -224,34 +235,68 @@ export class AppService implements OnApplicationBootstrap {
       });
 
       this.client.on('guildMemberAdd', async (guildMember) => {
-        if (!DISCORD_SERVER_RENAME.has(guildMember.guild.id)) return;
         try {
-          const oldUsername = guildMember.user.username;
-          let username = guildMember.user.username;
-          username = username.toLowerCase();
-          username = username.normalize("NFD");
-          username = normalizeDiacritics(username);
-          username = username
-            .replace('͜', '')
-            .replace('1', 'i')
-            .replace('$', 's')
-            .replace(/\[.*?]/gi, '')
-            .replace(/\(.*?\)/gi, '')
-            .replace(/{.*?}/gi, '')
-            .replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '')
-            .replace(/\d/g,'')
 
-          const C = username.replace(/[^a-zA-Z]/g, '').length;
-          const L = username.replace(/[^а-яА-Я]/g, '').length;
+          if (!guildMember.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS, false)) return;
 
-          (L >= C)
-            ? username = username.replace(/[^а-яА-Я]/g, '')
-            : username = username.replace(/[^a-zA-Z]/g, '')
+          const shield: Record<string, string> = await this.redisService.hgetall(`shield:${guildMember.guild.id}`);
 
-          username = username.length === 0 ? 'Username' : capitalizeFirstLetter(username);
+          if (shield.status === 'true') {
+            await this.redisService.set(
+              `s:${guildMember.guild.id}:${guildMember.user.id}`,
+              guildMember.user.id,
+              'EX',
+              ms(shield.time)
+            )
 
-          await guildMember.setNickname(username);
-          this.logger.log(`Rename user from ${oldUsername} to ${username}`);
+            const groupKeys = await this.redisService.keys(`s:${guildMember.guild.id}:*`);
+            const joins: number = parseInt(shield.joins);
+            const groupLength: number = groupKeys.length;
+
+            if (groupLength === joins) {
+              for (const key of groupKeys) {
+                const id = await this.redisService.get(key);
+                if (!id) continue;
+
+                await guildMember.guild.members.ban(id, { reason: DISCORD_BAN_REASON_ENUM.shield_en });
+              }
+            }
+
+            if (groupLength > joins) {
+              const id = await this.redisService.get(groupKeys[groupLength - 1]);
+              if (id) await guildMember.guild.members.ban(id, { reason: DISCORD_BAN_REASON_ENUM.shield_en });
+            }
+          }
+
+          if (DISCORD_SERVER_RENAME.has(guildMember.guild.id)) {
+            const oldUsername = guildMember.user.username;
+            let username = guildMember.user.username;
+            username = username.toLowerCase();
+            username = username.normalize("NFD");
+            username = normalizeDiacritics(username);
+            username = username
+              .replace('͜', '')
+              .replace('1', 'i')
+              .replace('$', 's')
+              .replace(/\[.*?]/gi, '')
+              .replace(/\(.*?\)/gi, '')
+              .replace(/{.*?}/gi, '')
+              .replace(/[`~!@#$%^€&*()_|̅+\-=?;:'",.<>{}\[\]\\\/]/gi, '')
+              .replace(/\d/g,'')
+
+            const C = username.replace(/[^a-zA-Z]/g, '').length;
+            const L = username.replace(/[^а-яА-Я]/g, '').length;
+
+            (L >= C)
+              ? username = username.replace(/[^а-яА-Я]/g, '')
+              : username = username.replace(/[^a-zA-Z]/g, '')
+
+            username = username.length === 0 ? 'Username' : capitalizeFirstLetter(username);
+
+            await guildMember.setNickname(username);
+            this.logger.log(`Rename user from ${oldUsername} to ${username}`);
+          }
+
         } catch (errorOrException) {
           this.logger.error(`guildMemberAdd: ${errorOrException}`);
         }
