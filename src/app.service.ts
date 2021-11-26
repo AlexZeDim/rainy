@@ -97,7 +97,7 @@ export class AppService implements OnApplicationBootstrap {
       await this.client.login(process.env.discord);
 
       await this.rest.put(
-        Routes.applicationCommands(this.client.user.id), // TODO user ID probably fix
+        Routes.applicationCommands(this.client.user.id),
         { body: this.commandSlash },
       );
 
