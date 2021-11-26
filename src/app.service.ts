@@ -97,7 +97,7 @@ export class AppService implements OnApplicationBootstrap {
       await this.client.login(process.env.discord);
 
       await this.rest.put(
-        Routes.applicationCommands(this.client.user.id as Snowflake),
+        Routes.applicationCommands(this.client.user.id),
         { body: this.commandSlash },
       );
 
@@ -109,7 +109,7 @@ export class AppService implements OnApplicationBootstrap {
 
   private loadCommands(): void {
     const commandFiles = fs
-      .readdirSync(path.join(`${__dirname}`, '..', 'libs/shared/commands/'))
+      .readdirSync(path.join(`${__dirname}`, '..', 'libs/shared/src/commands/'))
       .filter(file => file.endsWith('.ts'));
 
     for (const file of commandFiles) {
