@@ -10,6 +10,7 @@ export const Shield = {
     .setDescription('Enables auto-ban protection for your server.')
     .addBooleanOption(option =>
       option.setName('status')
+        .setDescription('On / off switch')
         .setRequired(true)
     )
     .addStringOption(option =>
