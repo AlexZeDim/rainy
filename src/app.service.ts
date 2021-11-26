@@ -124,6 +124,8 @@ export class AppService implements OnApplicationBootstrap {
       this.client.on('interactionCreate', async (interaction: Interaction): Promise<void> => {
         if (!interaction.isCommand()) return;
 
+        if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
+
         const command = this.commandsMessage.get(interaction.commandName);
         if (!command) return;
 
