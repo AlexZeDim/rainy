@@ -13,7 +13,7 @@ import {
   DISCORD_LOGS,
   DISCORD_RELATIONS,
   DISCORD_SERVER_PROTECT,
-  DISCORD_SERVER_RENAME,
+  DISCORD_SERVER_RENAME, Massban,
   Shield,
 } from '@app/shared';
 import {
@@ -109,6 +109,8 @@ export class AppService implements OnApplicationBootstrap {
   private loadCommands(): void {
     this.commandsMessage.set(Shield.name, Shield);
     this.commandSlash.push(Shield.slashCommand.toJSON());
+    this.commandsMessage.set(Massban.name, Massban);
+    this.commandSlash.push(Massban.slashCommand.toJSON());
   }
 
   async bot(): Promise<void> {
@@ -125,6 +127,10 @@ export class AppService implements OnApplicationBootstrap {
         if (!interaction.isCommand()) return;
 
         if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
+
+        const guildId = DISCORD_RELATIONS.get(interaction.user.id);
+
+        if (guildId !== interaction.guild.id) return;
 
         const command = this.commandsMessage.get(interaction.commandName);
         if (!command) return;
