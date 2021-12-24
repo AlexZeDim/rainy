@@ -13,7 +13,7 @@ import {
   DISCORD_LOGS,
   DISCORD_RELATIONS,
   DISCORD_SERVER_PROTECT,
-  DISCORD_SERVER_RENAME, Massban,
+  DISCORD_SERVER_RENAME, ISlashCommand, Massban,
   Shield,
 } from '@app/shared';
 import {
@@ -42,7 +42,7 @@ export class AppService implements OnApplicationBootstrap {
 
   private collector: InteractionCollector<ButtonInteraction>;
 
-  private commandsMessage: Collection<string, any> = new Collection();
+  private commandsMessage: Collection<string, ISlashCommand> = new Collection();
 
   private commandSlash = [];
 

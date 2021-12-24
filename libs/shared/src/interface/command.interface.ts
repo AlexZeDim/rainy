@@ -12,7 +12,7 @@ export interface ISlashCommand {
 
   readonly guildOnly: boolean;
 
-  readonly slashCommand: SlashCommandBuilder;
+  readonly slashCommand: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 
   executeInteraction(interactionArgs: ISlashCommandArgs): Promise<void>;
 }
