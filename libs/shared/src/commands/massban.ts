@@ -38,6 +38,7 @@ export const Massban = {
         await interaction.guild.members.ban(snowflakeBan, { reason });
       }
 
+      await interaction.reply({ content: `Successfully banned ${snowflakesBan.length} users`, ephemeral: true});
     } catch (errorOrException) {
       console.error(errorOrException);
       await interaction.reply({ content: errorOrException.message, ephemeral: true });
