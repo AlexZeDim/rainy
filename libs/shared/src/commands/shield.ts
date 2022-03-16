@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ISlashCommandArgs } from "@app/shared/interface";
+import { ISlashCommand, ISlashCommandArgs } from "@app/shared/interface";
 
-export const Shield = {
+export const Shield: ISlashCommand = {
   name: 'shield',
   description: 'This command server threshold for incoming members',
   guildOnly: true,
@@ -40,9 +40,9 @@ export const Shield = {
         joins,
       };
 
-      const shield = await redis.hmset(`shield:${interaction.guild.id}`, shieldArgs);
+      const shield = await redis.hset(`shield:${interaction.guild.id}`, shieldArgs);
 
-      shield === 'OK'
+      shield === 1
        ? await interaction.reply({ content: `Enabled ${status}, time: ${time}, joins: ${joins}`, ephemeral: true })
        : await interaction.reply({ content: `Enabled ${status}, time: ${time}, joins: ${joins}`, ephemeral: true });
     } catch (errorOrException) {

@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ISlashCommandArgs } from '@app/shared/interface';
+import { ISlashCommand, ISlashCommandArgs } from '@app/shared/interface';
 import { Permissions, Snowflake } from 'discord.js';
 import { DISCORD_BAN_REASON_ENUM } from '@app/shared/enums';
 
-export const Massban = {
+export const Massban: ISlashCommand = {
   name: 'massban',
   description: 'Use ban function for the selected snowflake IDs ',
   guildOnly: true,

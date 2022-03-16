@@ -10,6 +10,8 @@ export interface ISlashCommandArgs {
 export interface ISlashCommand {
   readonly name: string;
 
+  readonly description: string;
+
   readonly guildOnly: boolean;
 
   readonly slashCommand: Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
