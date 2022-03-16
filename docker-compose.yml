@@ -15,6 +15,7 @@ services:
     image: redis:6-alpine
     restart: always
     container_name: redis
+    command: redis-server --requirepass $PASSWORD --appendonly yes
     volumes:
       - ./volumes/redis:/data:rw,z
     expose:
