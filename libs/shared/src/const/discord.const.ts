@@ -3,6 +3,7 @@ import {
   DISCORD_AUTHORIZED_ENUM,
   DISCORD_BAN_REASON_ENUM,
   DISCORD_CHANNELS,
+  DISCORD_MONK_ROLES,
   DISCORD_SERVER_RENAME_ENUM,
   DISCORD_SERVERS_ENUM,
 } from "@app/shared/enums";
@@ -66,6 +67,15 @@ export const DISCORD_SERVER_PROTECT: Set<Snowflake> = new Set([
   DISCORD_SERVERS_ENUM.DreamGroove,
   DISCORD_SERVERS_ENUM.HallOfTheGuardian,
   DISCORD_SERVERS_ENUM.TempleOfVoidLight,
+]);
+
+export const DISCORD_MONK_ROLES_BOOST_TITLES: Set<Snowflake> = new Set([
+  DISCORD_MONK_ROLES.Boost1,
+  DISCORD_MONK_ROLES.Boost2,
+  DISCORD_MONK_ROLES.Boost3,
+  DISCORD_MONK_ROLES.Boost4,
+  DISCORD_MONK_ROLES.Boost5,
+  DISCORD_MONK_ROLES.Boost6,
 ]);
 
 export const DISCORD_CHANNELS_PROTECT: Set<Snowflake> = new Set([

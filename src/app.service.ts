@@ -11,9 +11,13 @@ import {
   DISCORD_CROSS_CHAT_BOT,
   DISCORD_EMOJI,
   DISCORD_LOGS,
+  DISCORD_MONK_ROLES,
+  DISCORD_MONK_ROLES_BOOST_TITLES,
   DISCORD_RELATIONS,
   DISCORD_SERVER_PROTECT,
-  DISCORD_SERVER_RENAME, ISlashCommand, Massban,
+  DISCORD_SERVER_RENAME,
+  DISCORD_SERVERS_ENUM,
+  ISlashCommand, Massban,
   Shield,
 } from '@app/shared';
 import {
@@ -28,7 +32,7 @@ import {
   InteractionCollector,
   Channel,
   Permissions,
-  Collection, Interaction,
+  Collection, Interaction, GuildMember, PartialGuildMember,
 } from 'discord.js';
 
 
@@ -129,7 +133,6 @@ export class AppService implements OnApplicationBootstrap {
         if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
 
         const guildId = DISCORD_RELATIONS.get(interaction.user.id);
-
         if (guildId !== interaction.guild.id) return;
 
         const command = this.commandsMessage.get(interaction.commandName);
@@ -174,6 +177,23 @@ export class AppService implements OnApplicationBootstrap {
           }
         } catch (errorOrException) {
           this.logger.error(`messageCreate: ${errorOrException}`);
+        }
+      });
+
+      this.client.on('guildMemberUpdate', async (
+          oldMember: GuildMember | PartialGuildMember,
+          newMember: GuildMember
+      ) => {
+        if (
+            newMember
+            && newMember.guild.id === DISCORD_SERVERS_ENUM.TempleOfFiveDawns
+            && oldMember.roles.cache.size < newMember.roles.cache.size
+        ) {
+          const flag = newMember.roles.cache.every((v, k) => DISCORD_MONK_ROLES_BOOST_TITLES.has(k));
+
+          if (flag) {
+            await newMember.roles.set([DISCORD_MONK_ROLES.BoostMeta]);
+          }
         }
       });
 
@@ -261,11 +281,15 @@ export class AppService implements OnApplicationBootstrap {
               guildMember.user.id,
               'EX',
               ms(shield.time)
-            )
+            );
+
+            this.logger.log(`guildMemberAdd: key s:${guildMember.guild.id}:${guildMember.user.id} added for ${ms(shield.time)}`);
 
             const groupKeys = await this.redisService.keys(`s:${guildMember.guild.id}:*`);
             const joins: number = parseInt(shield.joins);
             const groupLength: number = groupKeys.length;
+
+            this.logger.log(`Server threshold joins: ${joins} Total group keys: ${groupLength}`);
 
             if (groupLength === joins) {
               for (const key of groupKeys) {
