@@ -189,10 +189,17 @@ export class AppService implements OnApplicationBootstrap {
             && newMember.guild.id === DISCORD_SERVERS_ENUM.TempleOfFiveDawns
             && oldMember.roles.cache.size < newMember.roles.cache.size
         ) {
-          const flag = newMember.roles.cache.every((v, k) => DISCORD_MONK_ROLES_BOOST_TITLES.has(k));
+          let flag = false;
+
+          for (const roleId of Array.from(newMember.roles.cache.keys())) {
+            if (DISCORD_MONK_ROLES_BOOST_TITLES.has(roleId)) {
+              flag = true;
+              break;
+            }
+          }
 
           if (flag) {
-            await newMember.roles.set([DISCORD_MONK_ROLES.BoostMeta]);
+            await newMember.roles.add(DISCORD_MONK_ROLES.BoostMeta);
           }
         }
       });
