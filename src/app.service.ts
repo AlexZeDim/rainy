@@ -4,6 +4,7 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import ms from 'ms';
+
 import {
   DISCORD_BAN_REASON_ENUM,
   DISCORD_BANS, DISCORD_CHANNELS,
@@ -20,19 +21,25 @@ import {
   ISlashCommand, Massban,
   Shield,
 } from '@app/shared';
+
 import {
   Intents,
   Client,
   MessageActionRow,
   MessageButton,
   MessageEmbed,
-  ButtonInteraction,
   Snowflake,
   TextChannel,
   InteractionCollector,
-  Channel,
   Permissions,
-  Collection, Interaction, GuildMember, PartialGuildMember,
+  Collection,
+  Interaction,
+  GuildMember,
+  PartialGuildMember,
+  MappedInteractionTypes,
+  MessageComponentInteraction,
+  CacheType,
+  AnyChannel,
 } from 'discord.js';
 
 
@@ -44,7 +51,7 @@ export class AppService implements OnApplicationBootstrap {
 
   private channel: TextChannel;
 
-  private collector: InteractionCollector<ButtonInteraction>;
+  private collector: InteractionCollector<MappedInteractionTypes["ACTION_ROW"]>;
 
   private commandsMessage: Collection<string, ISlashCommand> = new Collection();
 
@@ -61,7 +68,7 @@ export class AppService implements OnApplicationBootstrap {
     private readonly redisService: Redis,
   ) {}
 
-  private filterBan = async (interaction: ButtonInteraction): Promise<boolean> => {
+  private filterBan = async (interaction: MessageComponentInteraction<CacheType>): Promise<boolean> => {
     try {
       if (!!await this.redisService.get(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
         const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
@@ -119,9 +126,17 @@ export class AppService implements OnApplicationBootstrap {
 
   async bot(): Promise<void> {
     try {
-      this.client.on('ready', async () => this.logger.log(`Logged in as ${this.client.user.tag}!`))
+      this.client.on('ready', async () => {
+        this.logger.log(`Logged in as ${this.client.user.tag}!`);
+      });
 
       const channel = await this.client.channels.fetch(DISCORD_CHANNELS.CrossChat_BanThread);
+      const m = await this.client.channels.fetch('474036493061718019') as TextChannel;
+      if (m) {
+        const messages = await m.messages.fetch({ limit: 100 });
+        console.log(messages);
+      }
+
       if (!channel || channel.type !== 'GUILD_TEXT') return;
 
       this.channel = channel as TextChannel;
@@ -148,6 +163,10 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on('messageCreate', async(message) => {
         try {
+
+          if (message.guild.id === '474036493061718016') {
+            console.log(message.content);
+          }
 
           if (
             DISCORD_SERVER_PROTECT.has(message.guildId)
@@ -211,7 +230,7 @@ export class AppService implements OnApplicationBootstrap {
           if (guildBan.reason && DISCORD_BANS.has(guildBan.reason.toLowerCase())) {
 
             const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(guildBan.guild.id));
-            const channel: Channel | null = await this.client.channels.fetch(DISCORD_LOGS);
+            const channel: AnyChannel = await this.client.channels.fetch(DISCORD_LOGS);
             if (channel) {
               await (channel as TextChannel).send(`${guildBan.user.id} - ${emojiEdit} ${guildBan.guild.name}`);
             }

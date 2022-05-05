@@ -75,7 +75,6 @@ export const DISCORD_MONK_ROLES_BOOST_TITLES: Set<Snowflake> = new Set([
   DISCORD_MONK_ROLES.Boost3,
   DISCORD_MONK_ROLES.Boost4,
   DISCORD_MONK_ROLES.Boost5,
-  DISCORD_MONK_ROLES.Boost6,
 ]);
 
 export const DISCORD_CHANNELS_PROTECT: Set<Snowflake> = new Set([
