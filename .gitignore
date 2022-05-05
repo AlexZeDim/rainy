@@ -36,3 +36,10 @@ lerna-debug.log*
 
 # Env
 .env
+
+# Volumes
+volumes
+
+# Packet manager files
+yarn.lock
+package.json
