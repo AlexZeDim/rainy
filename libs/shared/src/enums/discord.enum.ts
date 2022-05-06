@@ -67,7 +67,7 @@ export enum DISCORD_AUTHORIZED_ENUM {
   HardKul = '173385348099866626',
   // Warrior
   Yadder = '218849843110477835',
-  // Paradin
+  // Paladin
   Rainon = '198923317124530177',
   Solifugae = '119781894371016704',
   Uchur = '173477542823460864',
@@ -79,7 +79,9 @@ export enum DISCORD_AUTHORIZED_ENUM {
 }
 
 export enum DISCORD_ROLES {
-  PaladinMember = '886198703495475220'
+  PaladinMember = '886198703495475220',
+  MoteOfLight = '766136598579380285',
+  Supported = '696951702758227998',
 }
 
 export enum DISCORD_CHANNELS {

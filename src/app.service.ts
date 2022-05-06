@@ -13,7 +13,9 @@ import {
   DISCORD_LOGS,
   DISCORD_MONK_ROLES,
   DISCORD_MONK_ROLES_BOOST_TITLES,
+  DISCORD_RAINON_HOME,
   DISCORD_RELATIONS,
+  DISCORD_ROLES,
   DISCORD_SERVER_PROTECT,
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
@@ -122,6 +124,8 @@ export class AppService implements OnApplicationBootstrap {
       this.client.on('ready', async () => this.logger.log(`Logged in as ${this.client.user.tag}!`))
 
       const channel = await this.client.channels.fetch(DISCORD_CHANNELS.CrossChat_BanThread);
+      const rainyHome = await this.client.guilds.fetch(DISCORD_RAINON_HOME);
+
       if (!channel || channel.type !== 'GUILD_TEXT') return;
 
       this.channel = channel as TextChannel;
@@ -148,7 +152,6 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on('messageCreate', async(message) => {
         try {
-
           if (
             DISCORD_SERVER_PROTECT.has(message.guildId)
             && DISCORD_CHANNELS_PROTECT.has(message.channelId)
@@ -184,22 +187,47 @@ export class AppService implements OnApplicationBootstrap {
           oldMember: GuildMember | PartialGuildMember,
           newMember: GuildMember
       ) => {
-        if (
-            newMember
-            && newMember.guild.id === DISCORD_SERVERS_ENUM.TempleOfFiveDawns
-            && oldMember.roles.cache.size < newMember.roles.cache.size
-        ) {
+        if (newMember && newMember.guild.id === DISCORD_SERVERS_ENUM.TempleOfFiveDawns) {
           let flag = false;
+          // Role has been added
+          if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+            for (const roleId of Array.from(newMember.roles.cache.keys())) {
+              if (DISCORD_MONK_ROLES_BOOST_TITLES.has(roleId)) {
+                flag = true;
+                break;
+              }
+            }
 
-          for (const roleId of Array.from(newMember.roles.cache.keys())) {
-            if (DISCORD_MONK_ROLES_BOOST_TITLES.has(roleId)) {
-              flag = true;
-              break;
+            if (flag) {
+              await newMember.roles.add(DISCORD_MONK_ROLES.BoostMeta);
             }
           }
 
-          if (flag) {
-            await newMember.roles.add(DISCORD_MONK_ROLES.BoostMeta);
+          // TODO Role has been removed
+        }
+
+        if (!rainyHome) return;
+
+        if (newMember && newMember.guild.id === DISCORD_SERVERS_ENUM.SanctumOfLight) {
+          // Role has been added
+          if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+            if (newMember.roles.cache.has(DISCORD_ROLES.MoteOfLight)) {
+              const rainyGuildMember = await rainyHome.members.fetch(newMember.user.id);
+              if (rainyGuildMember && rainyHome.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES, false)) {
+                  await rainyGuildMember.roles.add(DISCORD_ROLES.Supported);
+              }
+            }
+          }
+
+          // Role has been removed
+          if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+            if (!oldMember.roles.cache.has(DISCORD_ROLES.MoteOfLight)) {
+
+              const rainyGuildMember = await rainyHome.members.fetch(newMember.user.id);
+              if (rainyGuildMember && rainyHome.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES, false)) {
+                await rainyGuildMember.roles.remove(DISCORD_ROLES.Supported);
+              }
+            }
           }
         }
       });
