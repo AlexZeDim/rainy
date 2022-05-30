@@ -22,6 +22,12 @@
       ],
       "@app/shared/*": [
         "libs/shared/src/*"
+      ],
+      "@app/pg": [
+        "libs/pg/src"
+      ],
+      "@app/pg/*": [
+        "libs/pg/src/*"
       ]
     }
   }
