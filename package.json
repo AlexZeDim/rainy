@@ -32,6 +32,7 @@
     "@nestjs/core": "8.2.0",
     "@nestjs/platform-express": "8.2.0",
     "@nestjs/schedule": "1.0.1",
+    "@nestjs/typeorm": "8.0.4",
     "@types/ms": "0.7.31",
     "discord.js": "13.1.0",
     "ioredis": "4.28.0",
@@ -39,7 +40,8 @@
     "normalize-text": "2.3.3",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
-    "rxjs": "7.4.0"
+    "rxjs": "7.4.0",
+    "typeorm": "0.3.6"
   },
   "devDependencies": {
     "@nestjs/cli": "8.1.4",
@@ -86,7 +88,8 @@
     ],
     "moduleNameMapper": {
       "^@app/core(|/.*)$": "<rootDir>/libs/core/src/$1",
-      "^@app/shared(|/.*)$": "<rootDir>/libs/shared/src/$1"
+      "^@app/shared(|/.*)$": "<rootDir>/libs/shared/src/$1",
+      "^@app/pg(|/.*)$": "<rootDir>/libs/pg/src/$1"
     }
   }
 }

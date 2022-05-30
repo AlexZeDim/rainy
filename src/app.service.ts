@@ -1,9 +1,11 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
+import { InjectRepository } from '@nestjs/typeorm';
 import ms from 'ms';
+
 import {
   DISCORD_BAN_REASON_ENUM,
   DISCORD_BANS, DISCORD_CHANNELS,
@@ -22,6 +24,7 @@ import {
   ISlashCommand, Massban,
   Shield,
 } from '@app/shared';
+
 import {
   Intents,
   Client,
@@ -36,11 +39,15 @@ import {
   Permissions,
   Collection, Interaction, GuildMember, PartialGuildMember,
 } from 'discord.js';
+import { UsersEntity } from '@app/pg';
+import { Repository } from 'typeorm';
 
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
-  private client: Client
+  private client: Client;
+
+  private rainyUser: UsersEntity;
 
   private timeout: number = 1000 * 60 * 60 * 12;
 
@@ -61,6 +68,8 @@ export class AppService implements OnApplicationBootstrap {
   constructor(
     @InjectRedis()
     private readonly redisService: Redis,
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<UsersEntity>,
   ) {}
 
   private filterBan = async (interaction: ButtonInteraction): Promise<boolean> => {
@@ -99,7 +108,8 @@ export class AppService implements OnApplicationBootstrap {
         }
       });
 
-      await this.client.login(process.env.discord);
+      await this.loadRainy();
+      await this.client.login(this.rainyUser.token);
 
       await this.rest.put(
         Routes.applicationCommands(this.client.user.id),
@@ -109,6 +119,24 @@ export class AppService implements OnApplicationBootstrap {
       await this.bot();
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
+    }
+  }
+
+  private async loadRainy(): Promise<void> {
+    try {
+      const rainyUserEntity = await this.usersRepository.findOneBy({
+        name: 'Rainy',
+      });
+
+      if (!rainyUserEntity)
+        throw new NotFoundException('Rainy not found!');
+
+      if (!rainyUserEntity.token)
+        throw new NotFoundException('Rainy token not found!');
+
+      this.rainyUser = rainyUserEntity;
+    } catch (errorOrException) {
+      this.logger.error(`loadOraculum: ${errorOrException}`);
     }
   }
 
