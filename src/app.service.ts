@@ -59,7 +59,7 @@ export class AppService implements OnApplicationBootstrap {
 
   private commandSlash = [];
 
-  private readonly rest = new REST({ version: '9' }).setToken(process.env.discord);
+  private readonly rest = new REST({ version: '9' });
 
   private readonly logger = new Logger(
     AppService.name, { timestamp: true },
@@ -91,8 +91,6 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
-      this.loadCommands();
-
       // FIXME await this.redisService.flushall();
       this.client = new Client({
         partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
@@ -109,12 +107,8 @@ export class AppService implements OnApplicationBootstrap {
       });
 
       await this.loadRainy();
-      await this.client.login(this.rainyUser.token);
 
-      await this.rest.put(
-        Routes.applicationCommands(this.client.user.id),
-        { body: this.commandSlash },
-      );
+      await this.loadCommands();
 
       await this.bot();
     } catch (errorOrException) {
@@ -128,6 +122,8 @@ export class AppService implements OnApplicationBootstrap {
         name: 'Rainy',
       });
 
+      console.log(rainyUserEntity);
+
       if (!rainyUserEntity)
         throw new NotFoundException('Rainy not found!');
 
@@ -135,16 +131,25 @@ export class AppService implements OnApplicationBootstrap {
         throw new NotFoundException('Rainy token not found!');
 
       this.rainyUser = rainyUserEntity;
+
+      await this.client.login(this.rainyUser.token);
+
+      this.rest.setToken(this.rainyUser.token)
     } catch (errorOrException) {
       this.logger.error(`loadOraculum: ${errorOrException}`);
     }
   }
 
-  private loadCommands(): void {
+  private async loadCommands(): Promise<void> {
     this.commandsMessage.set(Shield.name, Shield);
     this.commandSlash.push(Shield.slashCommand.toJSON());
     this.commandsMessage.set(Massban.name, Massban);
     this.commandSlash.push(Massban.slashCommand.toJSON());
+
+    await this.rest.put(
+        Routes.applicationCommands(this.client.user.id),
+        { body: this.commandSlash },
+    );
   }
 
   async bot(): Promise<void> {
