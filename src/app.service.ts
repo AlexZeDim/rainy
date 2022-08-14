@@ -8,6 +8,7 @@ import ms from 'ms';
 import { UsersEntity } from '@app/pg';
 import { Repository } from 'typeorm';
 import { ButtonStyle } from "discord-api-types/v10";
+import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 
 import {
   DISCORD_BAN_REASON_ENUM,
@@ -48,9 +49,8 @@ import {
   MappedInteractionTypes,
   MessageComponentType,
   ActionRowBuilder,
-  GuildTextBasedChannel, ActionRowData, AnyComponentBuilder,
+  GuildTextBasedChannel,
 } from 'discord.js';
-import { MessageActionRowComponentBuilder } from "@discordjs/builders";
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
