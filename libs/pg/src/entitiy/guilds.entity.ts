@@ -1,16 +1,16 @@
 import { SUBJECT_VECTOR } from '@app/shared';
-import { ChannelsEntity, EntitiesEnum } from '@app/pg';
+import { ChannelsEntity, TABLE_ENTITY_ENUM, UsersEntity } from '@app/pg';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
+  JoinColumn, ManyToOne,
   OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: EntitiesEnum.GUILDS })
+@Entity({ name: TABLE_ENTITY_ENUM.GUILDS })
 export class GuildsEntity {
   @PrimaryColumn('bigint')
   id: string;
@@ -31,12 +31,16 @@ export class GuildsEntity {
   })
   icon?: string;
 
-  // TODO join user
   @Column({
     nullable: false,
     type: 'bigint',
+    name: 'owner_id',
   })
   ownerId: string;
+
+  @ManyToOne(() => UsersEntity, (user: UsersEntity) => user.id)
+  @JoinColumn({ name: 'owner_id' })
+  ownerUser: UsersEntity;
 
   @OneToMany(() => ChannelsEntity, (channel: ChannelsEntity) => channel.guild)
   @JoinColumn({ name: 'id' })
@@ -57,6 +61,13 @@ export class GuildsEntity {
     name: 'vector',
   })
   vector?: string;
+
+  @Column({
+    name: 'is_watch',
+    nullable: false,
+    default: false,
+  })
+  isWatch: boolean;
 
   @Column({
     default: null,

@@ -15,7 +15,7 @@ export const VoteUnban = {
         ),
 
     async executeInteraction({ interaction }: ISlashCommandArgs): Promise<void> {
-        if (!interaction.isCommand()) return;
+        if (!interaction.isChatInputCommand()) return;
         try {
             // TODO frame
         } catch (errorOrException) {

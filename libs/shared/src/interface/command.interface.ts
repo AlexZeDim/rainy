@@ -1,9 +1,11 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { Redis } from '@nestjs-modules/ioredis';
 import { Interaction } from 'discord.js';
+import { Logger } from "@nestjs/common";
 
 export interface ISlashCommandArgs {
   readonly interaction: Interaction,
+  readonly logger: Logger,
   readonly redis?: Redis,
 }
 

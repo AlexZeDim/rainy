@@ -8,6 +8,10 @@ import {
   DISCORD_SERVERS_ENUM,
 } from "@app/shared/enums";
 
+/**
+ * @deprecated TODO rework based on pg relations
+ */
+
 export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.SanctumOfLight, '741997711678636074'],
   [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, '741997711926100018'],

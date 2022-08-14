@@ -1,4 +1,4 @@
-import { GuildsEntity, EntitiesEnum } from '@app/pg';
+import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: EntitiesEnum.CHANNELS })
+@Entity({ name: TABLE_ENTITY_ENUM.CHANNELS })
 export class ChannelsEntity {
   @PrimaryColumn('bigint')
   id: string;
@@ -54,11 +54,26 @@ export class ChannelsEntity {
   channelType?: string;
 
   @Column({
+    name: 'is_watch',
+    nullable: false,
+    default: false,
+  })
+  isWatch: boolean;
+
+  @Column({
     name: 'is_deleted',
     nullable: false,
     default: false,
   })
   isDeleted?: boolean;
+
+  @Column({
+    name: 'is_redacted',
+    nullable: false,
+    default: false,
+  })
+  isRedacted: boolean;
+
 
   @Column({
     default: null,

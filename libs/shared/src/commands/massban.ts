@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ISlashCommand, ISlashCommandArgs } from '@app/shared/interface';
-import { Permissions, Snowflake } from 'discord.js';
+import { PermissionsBitField, Snowflake } from 'discord.js';
 import { DISCORD_BAN_REASON_ENUM } from '@app/shared/enums';
 
 export const Massban: ISlashCommand = {
@@ -21,7 +21,7 @@ export const Massban: ISlashCommand = {
     ),
 
   async executeInteraction({ interaction }: ISlashCommandArgs): Promise<void> {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isChatInputCommand()) return;
     try {
       const snowflakes: string = interaction.options.getString('snowflakes', true);
 
@@ -30,7 +30,7 @@ export const Massban: ISlashCommand = {
 
       const snowflakesBan: Snowflake[] = snowflakes.split(',').map(id => id.trim());
 
-      if (!interaction.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS, false)) {
+      if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.BanMembers, false)) {
         throw new Error('Not permission to ban on this server.');
       }
 

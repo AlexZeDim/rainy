@@ -16,9 +16,16 @@ export const Shield: ISlashCommand = {
     .addStringOption(option =>
       option.setName('time')
         .setDescription('Cluster time for joining the server.')
-        .addChoice('1 minute', '1m')
-        .addChoice('5 minutes', '5m')
-        .addChoice('10 minutes', '10m')
+        .addChoices({
+          name: '1 minute',
+          value: '1m'
+        }, {
+          name: '5 minutes',
+          value: '5m',
+        }, {
+          name: '10 minutes',
+          value: '10m'
+        })
         .setRequired(true)
     )
     .addIntegerOption(option =>
@@ -28,7 +35,7 @@ export const Shield: ISlashCommand = {
     ),
 
   async executeInteraction({ interaction, redis }: ISlashCommandArgs): Promise<void> {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isChatInputCommand()) return;
     try {
       const time: string = interaction.options.getString('time', true);
       const status: boolean = interaction.options.getBoolean('status', true);

@@ -1,12 +1,12 @@
 # Rainy
 
-Rainy was born as a small discord bot, that handles only one problem, it renames every user on join event. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft. But sometimes is may be known as `Janisse` in the name of co-owner in [Monk's Temple of Five Dawns](https://discord.com/invite/fYSNb5U) Discord.
+Rainy was born as a small discord bot, that handles only one problem, checking and renaming every user on join. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` and his [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft. But sometimes is may be known as `Janisse` in the name of co-owner in [Monk's Temple of Five Dawns](https://discord.com/invite/fYSNb5U) Discord.
 
 ## Permissions
 
 Rainy needs `rename user` permission and the most top (literally) upper-bottom placed role above all others. It doesn't need an `administrator` title or any other special permissions. But anyway, since the code is open-sourced you could give to the bot any permissions and make sure that it won't abuse it.
 
-If bot doesn't rename the user, well, mainly because lack of permissions.
+If bot doesn't rename the user and your server mentioned in rename list, mainly because lack of permissions.
 
 
 ## How to invite?

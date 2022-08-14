@@ -5,6 +5,9 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { InjectRepository } from '@nestjs/typeorm';
 import ms from 'ms';
+import { UsersEntity } from '@app/pg';
+import { Repository } from 'typeorm';
+import { ButtonStyle } from "discord-api-types/v10";
 
 import {
   DISCORD_BAN_REASON_ENUM,
@@ -21,27 +24,33 @@ import {
   DISCORD_SERVER_PROTECT,
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
-  ISlashCommand, Massban,
+  ISlashCommand,
+  Massban,
   Shield,
 } from '@app/shared';
 
 import {
-  Intents,
   Client,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-  ButtonInteraction,
   Snowflake,
   TextChannel,
   InteractionCollector,
   Channel,
-  Permissions,
-  Collection, Interaction, GuildMember, PartialGuildMember,
+  Collection,
+  Interaction,
+  GuildMember,
+  PartialGuildMember,
+  ButtonBuilder,
+  Partials,
+  GatewayIntentBits,
+  ChannelType,
+  PermissionsBitField,
+  EmbedBuilder,
+  MappedInteractionTypes,
+  MessageComponentType,
+  ActionRowBuilder,
+  GuildTextBasedChannel, ActionRowData, AnyComponentBuilder,
 } from 'discord.js';
-import { UsersEntity } from '@app/pg';
-import { Repository } from 'typeorm';
-
+import { MessageActionRowComponentBuilder } from "@discordjs/builders";
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -51,9 +60,9 @@ export class AppService implements OnApplicationBootstrap {
 
   private timeout: number = 1000 * 60 * 60 * 12;
 
-  private channel: TextChannel;
+  private channel: GuildTextBasedChannel;
 
-  private collector: InteractionCollector<ButtonInteraction>;
+  private collector: InteractionCollector<MappedInteractionTypes[MessageComponentType]>;
 
   private commandsMessage: Collection<string, ISlashCommand> = new Collection();
 
@@ -72,7 +81,7 @@ export class AppService implements OnApplicationBootstrap {
     private readonly usersRepository: Repository<UsersEntity>,
   ) {}
 
-  private filterBan = async (interaction: ButtonInteraction): Promise<boolean> => {
+  private filterBan = async (interaction): Promise<boolean> => {
     try {
       if (!!await this.redisService.get(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
         const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
@@ -93,13 +102,17 @@ export class AppService implements OnApplicationBootstrap {
     try {
       // FIXME await this.redisService.flushall();
       this.client = new Client({
-        partials: ['USER', 'CHANNEL', 'GUILD_MEMBER'],
+        partials: [
+          Partials.User,
+          Partials.Channel,
+          Partials.GuildMember,
+        ],
         intents: [
-          Intents.FLAGS.GUILD_BANS,
-          Intents.FLAGS.GUILDS,
-          Intents.FLAGS.GUILD_MEMBERS,
-          Intents.FLAGS.GUILD_INVITES,
-          Intents.FLAGS.GUILD_MESSAGES,
+          GatewayIntentBits.GuildBans,
+          GatewayIntentBits.Guilds,
+          GatewayIntentBits.GuildMembers,
+          GatewayIntentBits.GuildInvites,
+          GatewayIntentBits.GuildMessages,
         ],
         presence: {
           status: 'online'
@@ -159,10 +172,10 @@ export class AppService implements OnApplicationBootstrap {
       const channel = await this.client.channels.fetch(DISCORD_CHANNELS.CrossChat_BanThread);
       const rainyHome = await this.client.guilds.fetch(DISCORD_RAINON_HOME);
 
-      if (!channel || channel.type !== 'GUILD_TEXT') return;
+      if (!channel || channel.type !== ChannelType.GuildText) return;
 
-      this.channel = channel as TextChannel;
-      this.collector = this.channel.createMessageComponentCollector({ filter: this.filterBan });
+      this.channel = channel as GuildTextBasedChannel;
+      this.collector = this.channel.createMessageComponentCollector({ filter: this.filterBan, time: 0 });
 
       this.client.on('interactionCreate', async (interaction: Interaction): Promise<void> => {
         if (!interaction.isCommand()) return;
@@ -176,7 +189,7 @@ export class AppService implements OnApplicationBootstrap {
         if (!command) return;
 
         try {
-          await command.executeInteraction({ interaction, redis: this.redisService });
+          await command.executeInteraction({ interaction, redis: this.redisService, logger: this.logger });
         } catch (errorException) {
           this.logger.error(errorException);
           await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
@@ -188,7 +201,7 @@ export class AppService implements OnApplicationBootstrap {
           if (
             DISCORD_SERVER_PROTECT.has(message.guildId)
             && DISCORD_CHANNELS_PROTECT.has(message.channelId)
-            && message.guild.me.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES, false)
+            && message.guild.members.me.permissions.has(PermissionsBitField.Flags.ManageMessages, false)
           ) {
 
             if (
@@ -246,7 +259,7 @@ export class AppService implements OnApplicationBootstrap {
           if (oldMember.roles.cache.size < newMember.roles.cache.size) {
             if (newMember.roles.cache.has(DISCORD_ROLES.MoteOfLight)) {
               const rainyGuildMember = await rainyHome.members.fetch(newMember.user.id);
-              if (rainyGuildMember && rainyHome.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES, false)) {
+              if (rainyGuildMember && rainyHome.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles, false)) {
                   await rainyGuildMember.roles.add(DISCORD_ROLES.Supported);
               }
             }
@@ -257,7 +270,7 @@ export class AppService implements OnApplicationBootstrap {
             if (!oldMember.roles.cache.has(DISCORD_ROLES.MoteOfLight)) {
 
               const rainyGuildMember = await rainyHome.members.fetch(newMember.user.id);
-              if (rainyGuildMember && rainyHome.me.permissions.has(Permissions.FLAGS.MANAGE_ROLES, false)) {
+              if (rainyGuildMember && rainyHome.members.me.permissions.has(PermissionsBitField.Flags.ManageRoles, false)) {
                 await rainyGuildMember.roles.remove(DISCORD_ROLES.Supported);
               }
             }
@@ -279,19 +292,18 @@ export class AppService implements OnApplicationBootstrap {
 
             if (!await this.redisService.get(guildBan.user.id)) {
 
-              const buttons = new MessageActionRow()
+              const buttons = new ActionRowBuilder()
                 .addComponents(
-                  new MessageButton()
+                  new ButtonBuilder()
                     .setCustomId(guildBan.user.id)
                     .setLabel('Ban')
-                    .setStyle('DANGER')
-                  ,
-                );
+                    .setStyle(ButtonStyle.Danger)
+                ) as ActionRowBuilder<MessageActionRowComponentBuilder>;
 
               const emoji = this.client.emojis.cache.get(DISCORD_EMOJI.get(guildBan.guild.id));
 
               const embed =
-                new MessageEmbed()
+                new EmbedBuilder()
                   .setDescription(`**${guildBan.user.username}#${guildBan.user.discriminator}** заблокирован на:`)
                   .addFields({ name: '\u200B', value: `${emoji} - ✅`, inline: true });
 
@@ -317,8 +329,8 @@ export class AppService implements OnApplicationBootstrap {
 
             const emojiEdit = this.client.emojis.cache.get(DISCORD_EMOJI.get(discordServer));
 
-            const [embed] = interaction.message.embeds as MessageEmbed[];
-            const newEmbed = embed.addField('\u200B', `${emojiEdit} - ✅`, true);
+            const [embed] = interaction.message.embeds as unknown as EmbedBuilder[];
+            const newEmbed = embed.addFields({ name: '\u200B', value: `${emojiEdit} - ✅`, inline: true });
 
             await interaction.update({ embeds: [ newEmbed ] });
           }
@@ -339,7 +351,7 @@ export class AppService implements OnApplicationBootstrap {
       this.client.on('guildMemberAdd', async (guildMember) => {
         try {
 
-          if (!guildMember.guild.me.permissions.has(Permissions.FLAGS.BAN_MEMBERS, false)) return;
+          if (!guildMember.guild.members.me.permissions.has(PermissionsBitField.Flags.BanMembers, false)) return;
 
           const shield: Record<string, string> = await this.redisService.hgetall(`shield:${guildMember.guild.id}`);
 

@@ -1,4 +1,4 @@
-import { EntitiesEnum } from '@app/pg';
+import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
 import {
   Column,
   CreateDateColumn,
@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: EntitiesEnum.USERS })
+@Entity({ name: TABLE_ENTITY_ENUM.USERS })
 export class UsersEntity {
   @PrimaryColumn('bigint')
   id: string;
@@ -72,6 +72,10 @@ export class UsersEntity {
     type: 'character varying',
   })
   roles: string[];
+
+  @OneToMany(() => GuildsEntity, (guild: GuildsEntity) => guild.ownerUser)
+  @JoinColumn({ name: 'id' })
+  ownerGuilds: GuildsEntity[];
 
   @Column({
     default: null,
