@@ -1,14 +1,16 @@
 import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
+import { CoreUsersEntity } from "@app/pg/entitiy/core-users.entity";
 import {
   Column,
   CreateDateColumn,
-  Entity,
+  Entity, Index,
   JoinColumn,
-  OneToMany,
+  OneToMany, OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+@Index('ix__users__name', ['name'], {})
 @Entity({ name: TABLE_ENTITY_ENUM.USERS })
 export class UsersEntity {
   @PrimaryColumn('bigint')
@@ -43,24 +45,6 @@ export class UsersEntity {
     nullable: true,
     default: null,
     type: 'varchar',
-    name: 'token',
-    length: 128,
-  })
-  token?: string;
-
-  @Column({
-    nullable: true,
-    default: null,
-    type: 'varchar',
-    name: 'secret',
-    length: 128,
-  })
-  secret?: string;
-
-  @Column({
-    nullable: true,
-    default: null,
-    type: 'varchar',
     name: 'avatar',
     length: 128,
   })
@@ -76,6 +60,9 @@ export class UsersEntity {
   @OneToMany(() => GuildsEntity, (guild: GuildsEntity) => guild.ownerUser)
   @JoinColumn({ name: 'id' })
   ownerGuilds: GuildsEntity[];
+
+  @OneToOne(() => CoreUsersEntity, (coreUser) => coreUser.user)
+  coreUser: CoreUsersEntity;
 
   @Column({
     default: null,

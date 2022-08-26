@@ -5,7 +5,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { InjectRepository } from '@nestjs/typeorm';
 import ms from 'ms';
-import { UsersEntity } from '@app/pg';
+import { CoreUsersEntity, UsersEntity } from '@app/pg';
 import { Repository } from 'typeorm';
 import { ButtonStyle } from "discord-api-types/v10";
 import { MessageActionRowComponentBuilder } from '@discordjs/builders';
@@ -56,7 +56,7 @@ import {
 export class AppService implements OnApplicationBootstrap {
   private client: Client;
 
-  private rainyUser: UsersEntity;
+  private rainyUser: CoreUsersEntity;
 
   private timeout: number = 1000 * 60 * 60 * 12;
 
@@ -79,6 +79,8 @@ export class AppService implements OnApplicationBootstrap {
     private readonly redisService: Redis,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    @InjectRepository(CoreUsersEntity)
+    private readonly coreUsersRepository: Repository<CoreUsersEntity>,
   ) {}
 
   private filterBan = async (interaction): Promise<boolean> => {
@@ -131,11 +133,9 @@ export class AppService implements OnApplicationBootstrap {
 
   private async loadRainy(): Promise<void> {
     try {
-      const rainyUserEntity = await this.usersRepository.findOneBy({
+      const rainyUserEntity = await this.coreUsersRepository.findOneBy({
         name: 'Rainy',
       });
-
-      console.log(rainyUserEntity);
 
       if (!rainyUserEntity)
         throw new NotFoundException('Rainy not found!');

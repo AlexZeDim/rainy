@@ -37,6 +37,7 @@ export const Shield: ISlashCommand = {
   async executeInteraction({ interaction, redis }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
     try {
+      // TODO ingress traffic control
       const time: string = interaction.options.getString('time', true);
       const status: boolean = interaction.options.getBoolean('status', true);
       const joins: number = interaction.options.getInteger('joins', true);

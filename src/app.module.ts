@@ -3,7 +3,7 @@ import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelsEntity, GuildsEntity, UsersEntity } from '@app/pg';
+import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app/pg';
 
 @Module({
   imports: [
@@ -19,6 +19,7 @@ import { ChannelsEntity, GuildsEntity, UsersEntity } from '@app/pg';
         ChannelsEntity,
         GuildsEntity,
         UsersEntity,
+        CoreUsersEntity,
       ],
       synchronize: false,
       keepConnectionAlive: true,
@@ -28,6 +29,7 @@ import { ChannelsEntity, GuildsEntity, UsersEntity } from '@app/pg';
       ChannelsEntity,
       GuildsEntity,
       UsersEntity,
+      CoreUsersEntity,
     ]),
     ScheduleModule.forRoot(),
     RedisModule.forRoot({
