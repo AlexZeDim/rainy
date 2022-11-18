@@ -74,7 +74,6 @@ export class ChannelsEntity {
   })
   isRedacted: boolean;
 
-
   @Column({
     default: null,
     nullable: true,

@@ -273,6 +273,7 @@ export class AppService implements OnApplicationBootstrap {
               }
 
               if (flag) {
+                await newMember.fetch();
                 await newMember.roles.add(DISCORD_MONK_ROLES.BoostMeta);
               }
             }
@@ -299,6 +300,7 @@ export class AppService implements OnApplicationBootstrap {
                     false,
                   )
                 ) {
+                  await rainyGuildMember.fetch();
                   await rainyGuildMember.roles.add(DISCORD_ROLES.Supported);
                 }
               }
@@ -317,6 +319,7 @@ export class AppService implements OnApplicationBootstrap {
                     false,
                   )
                 ) {
+                  await rainyGuildMember.fetch();
                   await rainyGuildMember.roles.remove(DISCORD_ROLES.Supported);
                 }
               }

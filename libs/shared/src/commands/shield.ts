@@ -1,6 +1,10 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ISlashCommand, ISlashCommandArgs } from '@app/shared/interface';
 
+/**
+ * @description This command seems to be unused by community
+ * @deprecated
+ */
 export const Shield: ISlashCommand = {
   name: 'shield',
   description: 'This command server threshold for incoming members',
