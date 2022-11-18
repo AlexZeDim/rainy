@@ -10,7 +10,7 @@ import { REST } from '@discordjs/rest';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CoreUsersEntity, UsersEntity } from '@app/pg';
 import { Repository } from 'typeorm';
-import { ButtonStyle, ComponentType, Routes } from 'discord-api-types/v10';
+import { ButtonStyle, Routes } from 'discord-api-types/v10';
 import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 import ms from 'ms';
 
@@ -52,11 +52,8 @@ import {
   EmbedBuilder,
   ActionRowBuilder,
   GuildTextBasedChannel,
-  InteractionCollector,
-  MappedInteractionTypes,
   ButtonInteraction,
   CacheType,
-  MessageComponentCollectorOptions,
 } from 'discord.js';
 
 @Injectable()
