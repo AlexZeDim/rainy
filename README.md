@@ -2,7 +2,7 @@
 
 <a href="https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot" class="button big">INVITE TO DISCORD</a>
 
-Rainy was born as a small discord bot, that handles only one problem, checking and renaming every user on join. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` <3 `Janisse`. She was co-manager of [Monk's Temple of Five Dawns,](https://discord.com/invite/fYSNb5U) and he is founder of [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft.
+Rainy was born as a small discord bot, that handles only one problem, checking and renaming every user on join. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` ❤️ `Janisse`. She was co-manager of [**Monk's Temple of Five Dawns**,](https://discord.com/invite/fYSNb5U) and he is founder of [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft.
 
 ## Permissions
 
@@ -18,7 +18,7 @@ If you want to add Rainy to your discord server, please use **[the following lin
 
 ## Contributon & Issues policy.
 
-We are very glad to hear any relevant proposal or any kinf of contribution from you. 
+We are very glad to hear any relevant proposal or any kind of contribution from you. 
 
  - Have you found a bug? Feel free to make an issue about it [here](https://github.com/AlexZeDim/rainy/issues)
  - If you want to contribute your code, just for the repo and make a PR. We are using [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) in description so take it as guide-line.
@@ -33,7 +33,7 @@ We are very glad to hear any relevant proposal or any kinf of contribution from 
 
 ```
 discord=your_token
-redis=_your_redis
+redis=your_redis
 port=your_port
 ```
 3. Install all dependecies `npm install` or `yarn`.
