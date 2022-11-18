@@ -12,7 +12,7 @@ services:
       - .env
 
   redis:
-    image: redis:6-alpine
+    image: redis:7-alpine
     restart: always
     container_name: redis
     command: redis-server --requirepass $password --appendonly yes
