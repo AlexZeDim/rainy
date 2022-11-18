@@ -1,4 +1,4 @@
-import { TABLE_ENTITY_ENUM, UsersEntity } from "@app/pg";
+import { TABLE_ENTITY_ENUM, UsersEntity } from '@app/pg';
 import {
   Column,
   CreateDateColumn,
@@ -7,8 +7,8 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Index('ix__core_users__name', ['name'], {})
 @Entity({ name: TABLE_ENTITY_ENUM.CORE_USERS })

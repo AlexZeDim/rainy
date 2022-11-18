@@ -3,7 +3,12 @@ import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app/pg';
+import {
+  ChannelsEntity,
+  CoreUsersEntity,
+  GuildsEntity,
+  UsersEntity,
+} from '@app/pg';
 
 @Module({
   imports: [
@@ -15,12 +20,7 @@ import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       logging: true,
-      entities: [
-        ChannelsEntity,
-        GuildsEntity,
-        UsersEntity,
-        CoreUsersEntity,
-      ],
+      entities: [ChannelsEntity, GuildsEntity, UsersEntity, CoreUsersEntity],
       synchronize: false,
       keepConnectionAlive: true,
       ssl: null,

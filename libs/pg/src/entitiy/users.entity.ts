@@ -1,11 +1,13 @@
 import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
-import { CoreUsersEntity } from "@app/pg/entitiy/core-users.entity";
+import { CoreUsersEntity } from '@app/pg/entitiy/core-users.entity';
 import {
   Column,
   CreateDateColumn,
-  Entity, Index,
+  Entity,
+  Index,
   JoinColumn,
-  OneToMany, OneToOne,
+  OneToMany,
+  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';

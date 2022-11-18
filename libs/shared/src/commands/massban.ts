@@ -10,27 +10,39 @@ export const Massban: ISlashCommand = {
   slashCommand: new SlashCommandBuilder()
     .setName('massban')
     .setDescription('Ban following users')
-    .addStringOption(option =>
-      option.setName('snowflakes')
+    .addStringOption((option) =>
+      option
+        .setName('snowflakes')
         .setDescription('425046052597661697, 198923317124530177')
-        .setRequired(true)
+        .setRequired(true),
     )
-    .addStringOption(option =>
-      option.setName('reason')
-        .setDescription('(OPTIONAL) Ban reason, "shield" by default.')
+    .addStringOption((option) =>
+      option
+        .setName('reason')
+        .setDescription('(OPTIONAL) Ban reason, "shield" by default.'),
     ),
 
   async executeInteraction({ interaction }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
     try {
-      const snowflakes: string = interaction.options.getString('snowflakes', true);
+      const snowflakes: string = interaction.options.getString(
+        'snowflakes',
+        true,
+      );
 
       let reason: string = interaction.options.getString('reason', false);
       if (!reason) reason = DISCORD_BAN_REASON_ENUM.shield_en;
 
-      const snowflakesBan: Snowflake[] = snowflakes.split(',').map(id => id.trim());
+      const snowflakesBan: Snowflake[] = snowflakes
+        .split(',')
+        .map((id) => id.trim());
 
-      if (!interaction.guild.members.me.permissions.has(PermissionsBitField.Flags.BanMembers, false)) {
+      if (
+        !interaction.guild.members.me.permissions.has(
+          PermissionsBitField.Flags.BanMembers,
+          false,
+        )
+      ) {
         throw new Error('Not permission to ban on this server.');
       }
 
@@ -38,10 +50,16 @@ export const Massban: ISlashCommand = {
         await interaction.guild.members.ban(snowflakeBan, { reason });
       }
 
-      await interaction.reply({ content: `Successfully banned ${snowflakesBan.length} users`, ephemeral: true});
+      await interaction.reply({
+        content: `Successfully banned ${snowflakesBan.length} users`,
+        ephemeral: true,
+      });
     } catch (errorOrException) {
       console.error(errorOrException);
-      await interaction.reply({ content: errorOrException.message, ephemeral: true });
+      await interaction.reply({
+        content: errorOrException.message,
+        ephemeral: true,
+      });
     }
-  }
-}
+  },
+};

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { ISlashCommand, ISlashCommandArgs } from "@app/shared/interface";
+import { ISlashCommand, ISlashCommandArgs } from '@app/shared/interface';
 
 export const Shield: ISlashCommand = {
   name: 'shield',
@@ -8,33 +8,43 @@ export const Shield: ISlashCommand = {
   slashCommand: new SlashCommandBuilder()
     .setName('shield')
     .setDescription('Enables auto-ban protection for your server.')
-    .addBooleanOption(option =>
-      option.setName('status')
+    .addBooleanOption((option) =>
+      option
+        .setName('status')
         .setDescription('On / off switch')
-        .setRequired(true)
+        .setRequired(true),
     )
-    .addStringOption(option =>
-      option.setName('time')
+    .addStringOption((option) =>
+      option
+        .setName('time')
         .setDescription('Cluster time for joining the server.')
-        .addChoices({
-          name: '1 minute',
-          value: '1m'
-        }, {
-          name: '5 minutes',
-          value: '5m',
-        }, {
-          name: '10 minutes',
-          value: '10m'
-        })
-        .setRequired(true)
+        .addChoices(
+          {
+            name: '1 minute',
+            value: '1m',
+          },
+          {
+            name: '5 minutes',
+            value: '5m',
+          },
+          {
+            name: '10 minutes',
+            value: '10m',
+          },
+        )
+        .setRequired(true),
     )
-    .addIntegerOption(option =>
-      option.setName('joins')
+    .addIntegerOption((option) =>
+      option
+        .setName('joins')
         .setDescription('Allowed parallel joins at cluster time value.')
-        .setRequired(true)
+        .setRequired(true),
     ),
 
-  async executeInteraction({ interaction, redis }: ISlashCommandArgs): Promise<void> {
+  async executeInteraction({
+    interaction,
+    redis,
+  }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
     try {
       // TODO ingress traffic control
@@ -48,14 +58,26 @@ export const Shield: ISlashCommand = {
         joins,
       };
 
-      const shield = await redis.hset(`shield:${interaction.guild.id}`, shieldArgs);
+      const shield = await redis.hset(
+        `shield:${interaction.guild.id}`,
+        shieldArgs,
+      );
 
       shield === 1
-       ? await interaction.reply({ content: `Enabled ${status}, time: ${time}, joins: ${joins}`, ephemeral: true })
-       : await interaction.reply({ content: `Enabled ${status}, time: ${time}, joins: ${joins}`, ephemeral: true });
+        ? await interaction.reply({
+            content: `Enabled ${status}, time: ${time}, joins: ${joins}`,
+            ephemeral: true,
+          })
+        : await interaction.reply({
+            content: `Enabled ${status}, time: ${time}, joins: ${joins}`,
+            ephemeral: true,
+          });
     } catch (errorOrException) {
       console.error(errorOrException);
-      await interaction.reply({ content: errorOrException.message, ephemeral: true });
+      await interaction.reply({
+        content: errorOrException.message,
+        ephemeral: true,
+      });
     }
-  }
-}
+  },
+};
