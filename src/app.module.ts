@@ -7,8 +7,11 @@ import {
   ChannelsEntity,
   CoreUsersEntity,
   GuildsEntity,
+  PermissionsEntity,
+  UserPermissionsEntity,
   UsersEntity,
 } from '@app/pg';
+import { SeederService } from './seeder/seeder.service';
 
 @Module({
   imports: [
@@ -20,7 +23,14 @@ import {
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       logging: true,
-      entities: [ChannelsEntity, GuildsEntity, UsersEntity, CoreUsersEntity],
+      entities: [
+        ChannelsEntity,
+        GuildsEntity,
+        UsersEntity,
+        CoreUsersEntity,
+        PermissionsEntity,
+        UserPermissionsEntity,
+      ],
       synchronize: false,
       keepConnectionAlive: true,
       ssl: null,
@@ -30,6 +40,8 @@ import {
       GuildsEntity,
       UsersEntity,
       CoreUsersEntity,
+      PermissionsEntity,
+      UserPermissionsEntity,
     ]),
     ScheduleModule.forRoot(),
     RedisModule.forRoot({
@@ -40,6 +52,6 @@ import {
       },
     }),
   ],
-  providers: [AppService],
+  providers: [AppService, SeederService],
 })
 export class AppModule {}

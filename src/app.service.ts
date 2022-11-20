@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -32,7 +33,6 @@ import {
   DISCORD_SERVERS_ENUM,
   ISlashCommand,
   Massban,
-  Shield,
 } from '@app/shared';
 
 import {
@@ -45,8 +45,6 @@ import {
   GuildMember,
   PartialGuildMember,
   ButtonBuilder,
-  Partials,
-  GatewayIntentBits,
   ChannelType,
   PermissionsBitField,
   EmbedBuilder,
@@ -55,6 +53,7 @@ import {
   ButtonInteraction,
   CacheType,
 } from 'discord.js';
+import { SeederService } from './seeder/seeder.service';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -79,6 +78,8 @@ export class AppService implements OnApplicationBootstrap {
   constructor(
     @InjectRedis()
     private readonly redisService: Redis,
+    @Inject(SeederService)
+    private readonly seederService: SeederService,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(CoreUsersEntity)
@@ -111,8 +112,9 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
-      // FIXME await this.redisService.flushall();
-      this.client = new Client({
+      await this.seederService.init(false);
+
+/*      this.client = new Client({
         partials: [Partials.User, Partials.Channel, Partials.GuildMember],
         intents: [
           GatewayIntentBits.GuildBans,
@@ -130,7 +132,7 @@ export class AppService implements OnApplicationBootstrap {
 
       await this.loadCommands();
 
-      await this.bot();
+      await this.bot();*/
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
     }
@@ -158,8 +160,6 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private async loadCommands(): Promise<void> {
-    this.commandsMessage.set(Shield.name, Shield);
-    this.commandSlash.push(Shield.slashCommand.toJSON());
     this.commandsMessage.set(Massban.name, Massban);
     this.commandSlash.push(Massban.slashCommand.toJSON());
 
