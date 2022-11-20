@@ -1,5 +1,6 @@
 import {
   ChannelsEntity,
+  GuildsEntity,
   PermissionsEntity,
   TABLE_ENTITY_ENUM,
   UsersEntity,
@@ -96,6 +97,26 @@ export class UserPermissionsEntity {
     name: 'channel_uuid',
   })
   channelUuid?: string;
+
+  @Column({
+    default: null,
+    nullable: true,
+    type: 'bigint',
+    name: 'guild_id',
+  })
+  guildId?: string;
+
+  @ManyToOne(() => GuildsEntity, (guildsEntity) => guildsEntity.userPermissions)
+  @JoinColumn({ name: 'guild_id' })
+  guild?: GuildsEntity;
+
+  @Column({
+    default: null,
+    nullable: true,
+    type: 'bigint',
+    name: 'guild_uuid',
+  })
+  guildUuid?: string;
 
   @Column({
     default: false,

@@ -1,5 +1,11 @@
 import { SUBJECT_VECTOR } from '@app/shared';
-import { ChannelsEntity, TABLE_ENTITY_ENUM, UsersEntity } from '@app/pg';
+import {
+  ChannelsEntity,
+  TABLE_ENTITY_ENUM,
+  UserPermissionsEntity,
+  UsersEntity,
+} from '@app/pg';
+
 import {
   Column,
   CreateDateColumn,
@@ -46,6 +52,12 @@ export class GuildsEntity {
   @OneToMany(() => ChannelsEntity, (channel: ChannelsEntity) => channel.guild)
   @JoinColumn({ name: 'id' })
   channels: ChannelsEntity[];
+
+  @OneToMany(
+    () => UserPermissionsEntity,
+    (userPermissions) => userPermissions.guild,
+  )
+  userPermissions: UserPermissionsEntity[];
 
   @Column({
     nullable: true,
