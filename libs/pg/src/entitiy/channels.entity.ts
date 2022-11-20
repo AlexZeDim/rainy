@@ -1,4 +1,9 @@
-import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
+import {
+  GuildsEntity,
+  TABLE_ENTITY_ENUM,
+  UserPermissionsEntity,
+} from '@app/pg';
+
 import {
   Column,
   CreateDateColumn,
@@ -6,6 +11,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -34,6 +40,12 @@ export class ChannelsEntity {
   @ManyToOne(() => GuildsEntity, (guild: GuildsEntity) => guild.id)
   @JoinColumn({ name: 'guild_id' })
   guild: GuildsEntity;
+
+  @OneToMany(
+    () => UserPermissionsEntity,
+    (userPermissions) => userPermissions.channel,
+  )
+  userPermissions: UserPermissionsEntity[];
 
   @Column({
     default: null,
