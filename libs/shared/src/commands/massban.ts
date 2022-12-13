@@ -31,7 +31,7 @@ export const Massban: ISlashCommand = {
       );
 
       let reason: string = interaction.options.getString('reason', false);
-      if (!reason) reason = DISCORD_BAN_REASON_ENUM.shield_en;
+      if (!reason) reason = DISCORD_BAN_REASON_ENUM.spam_en;
 
       const snowflakesBan: Snowflake[] = snowflakes
         .split(',')

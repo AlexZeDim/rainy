@@ -97,9 +97,7 @@ export const DISCORD_CHANNELS_PROTECT: Set<Snowflake> = new Set([
 
 export const DISCORD_CROSS_CHAT_BOT: Snowflake = '891021899172286555';
 
-export const DISCORD_BANS: Set<string> = new Set(
-  Object.values(DISCORD_BAN_REASON_ENUM),
-);
+export const DISCORD_REASON_BANS: Set<string> = new Set(Object.values(DISCORD_BAN_REASON_ENUM));
 
 export const DISCORD_LOGS: Snowflake = '896513694488477767';
 
