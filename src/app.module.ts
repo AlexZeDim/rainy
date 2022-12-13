@@ -8,6 +8,7 @@ import {
   CoreUsersEntity,
   GuildsEntity,
   PermissionsEntity,
+  RolesEntity,
   UserPermissionsEntity,
   UsersEntity,
 } from '@app/pg';
@@ -27,6 +28,7 @@ import { SeederService } from './seeder/seeder.service';
         ChannelsEntity,
         GuildsEntity,
         UsersEntity,
+        RolesEntity,
         CoreUsersEntity,
         PermissionsEntity,
         UserPermissionsEntity,
@@ -39,6 +41,7 @@ import { SeederService } from './seeder/seeder.service';
       ChannelsEntity,
       GuildsEntity,
       UsersEntity,
+      RolesEntity,
       CoreUsersEntity,
       PermissionsEntity,
       UserPermissionsEntity,
