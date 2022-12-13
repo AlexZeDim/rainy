@@ -5,13 +5,15 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { Logger, ServiceUnavailableException } from '@nestjs/common';
 import { DISCORD_MONK_ROLES_BOOST_TITLES, DISCORD_RELATIONS, DISCORD_SERVERS_ENUM, SUBJECT_VECTOR } from '@app/shared';
 import { Client, Collection } from 'discord.js';
+import * as console from 'console';
 
 export class SeederService {
   private readonly logger = new Logger(SeederService.name, { timestamp: true });
   private client: Client;
-  private guildStorage: Collection<string, GuildsEntity>;
-  private userStorage: Collection<string, UsersEntity>;
-  private roleStorage: Collection<string, RolesEntity>;
+  private guildStorage: Collection<string, GuildsEntity> = new Collection<string, GuildsEntity>();
+  private userStorage: Collection<string, UsersEntity> = new Collection<string, UsersEntity>();
+  private roleStorage: Collection<string, RolesEntity> = new Collection<string, RolesEntity>();
+  private userPermissionStorage: Collection<string, UserPermissionsEntity> = new Collection<string, UserPermissionsEntity>();
   constructor(
     @InjectRedis()
     private readonly redisService: Redis,
@@ -28,6 +30,8 @@ export class SeederService {
   ) {}
 
   async init(client: Client, flushAll: boolean) {
+    this.logger.log('init started!');
+
     if (!client) {
       throw new ServiceUnavailableException('Rainy client has not been initiated!')
     }
@@ -42,7 +46,7 @@ export class SeederService {
     await this.initDiscordRoles();
     await this.initUserPermissions();
 
-    this.logger.log('Test');
+    this.logger.log('init ended!');
   }
 
   async initGuilds() {
@@ -55,7 +59,13 @@ export class SeederService {
       });
 
       if (!guildEntity) {
-        const discordGuild = await this.client.guilds.fetch(guildId);
+        let discordGuild;
+        try {
+          discordGuild = await this.client.guilds.fetch(guildId);
+        } catch (errorOrException) {
+          this.logger.error(errorOrException);
+        }
+
         if (!discordGuild) {
           this.logger.log(`Guild: ${guildId}:${guild} is out of our reach index, skipping...`);
           continue;
@@ -164,16 +174,19 @@ export class SeederService {
         subjectUserId: this.client.user.id,
       });
 
-      if (userPermissionEntity) {
+      if (!userPermissionEntity) {
         userPermissionEntity = this.userPermissionsRepository.create({
           userId: userEntity.id,
           permissionUuid: commandPermissionEntity.uuid,
           guildId: guildEntity.id,
           subjectUserId: this.client.user.id,
+          isApplied: true,
         });
 
         await this.userPermissionsRepository.save(userPermissionEntity);
       }
+
+      this.userPermissionStorage.set(userPermissionEntity.uuid, userPermissionEntity);
     }
   }
 }

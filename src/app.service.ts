@@ -17,9 +17,7 @@ import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 import { SeederService } from './seeder/seeder.service';
 
 import {
-  DISCORD_BAN_REASON_ENUM,
   DISCORD_CHANNELS,
-  DISCORD_CROSS_CHAT_BOT,
   DISCORD_EMOJI,
   DISCORD_LOGS,
   DISCORD_MONK_ROLES,
@@ -48,8 +46,7 @@ import {
   EmbedBuilder,
   ActionRowBuilder,
   GuildTextBasedChannel,
-  ButtonInteraction,
-  CacheType, Events, Partials,
+  Events, Partials,
 } from 'discord.js';
 
 
@@ -87,31 +84,6 @@ export class AppService implements OnApplicationBootstrap {
     @InjectRepository(CoreUsersEntity)
     private readonly coreUsersRepository: Repository<CoreUsersEntity>,
   ) {}
-
-  private filterBan = async (
-    interaction: ButtonInteraction<CacheType>,
-  ): Promise<boolean> => {
-    try {
-      if (
-        !!(await this.redisService.get(interaction.customId)) &&
-        DISCORD_RELATIONS.has(interaction.user.id)
-      ) {
-        const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
-        const guild = this.client.guilds.cache.get(discordClassID);
-        if (guild) {
-          await guild.members.ban(interaction.customId, {
-            reason: 'Cross Ban Rainy',
-          });
-          return true;
-        }
-      }
-      return false;
-    } catch (errorOrException) {
-      this.logger.error(`filterBan: ${errorOrException}`);
-      return false;
-    }
-  };
-
   async onApplicationBootstrap(): Promise<void> {
     try {
       this.client = new Client({
@@ -127,7 +99,7 @@ export class AppService implements OnApplicationBootstrap {
         },
       });
 
-      // await this.loadRainy();
+      await this.loadRainy();
 
       // await this.loadCommands();
 
@@ -170,6 +142,7 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private async loadStorage(): Promise<void> {
+    // FIXME remove this shit
     const guildModeration = await this.guildsRepository.findOneBy({ name: 'Moder Chat' });
     const channelBanThread = await this.channelsRepository.findOneBy({ name: 'ban_list', guildId: guildModeration.id });
     const channelCrossBanLog = await this.channelsRepository.findOneBy({ name: 'crossban', guildId: guildModeration.id });
