@@ -5,4 +5,5 @@ export enum TABLE_ENTITY_ENUM {
   CORE_USERS = 'core_users',
   USER_PERMISSIONS = 'user_permissions',
   PERMISSIONS = 'permissions',
+  ROLES = 'roles'
 }

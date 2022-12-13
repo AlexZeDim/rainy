@@ -2,6 +2,7 @@ import {
   ChannelsEntity,
   GuildsEntity,
   PermissionsEntity,
+  RolesEntity,
   TABLE_ENTITY_ENUM,
   UsersEntity,
 } from '@app/pg';
@@ -60,6 +61,10 @@ export class UserPermissionsEntity {
     name: 'role_id',
   })
   roleId?: string;
+
+  @ManyToOne(() => RolesEntity, (roleEntity) => roleEntity.userPermissions)
+  @JoinColumn({ name: 'role_id' })
+  role?: RolesEntity;
 
   @Column({
     nullable: false,

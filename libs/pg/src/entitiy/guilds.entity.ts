@@ -1,6 +1,7 @@
 import { SUBJECT_VECTOR } from '@app/shared';
 import {
   ChannelsEntity,
+  RolesEntity,
   TABLE_ENTITY_ENUM,
   UserPermissionsEntity,
   UsersEntity,
@@ -52,6 +53,9 @@ export class GuildsEntity {
   @OneToMany(() => ChannelsEntity, (channel: ChannelsEntity) => channel.guild)
   @JoinColumn({ name: 'id' })
   channels: ChannelsEntity[];
+
+  @OneToMany(() => RolesEntity, (roles: RolesEntity) => roles.guild)
+  roles: RolesEntity[];
 
   @OneToMany(
     () => UserPermissionsEntity,

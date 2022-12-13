@@ -5,27 +5,26 @@ import {
   NotFoundException,
   OnApplicationBootstrap,
 } from '@nestjs/common';
+
 import { capitalizeFirstLetter, normalizeDiacritics } from 'normalize-text';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { REST } from '@discordjs/rest';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CoreUsersEntity, UsersEntity } from '@app/pg';
+import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app/pg';
 import { Repository } from 'typeorm';
-import { ButtonStyle, Routes } from 'discord-api-types/v10';
+import { ButtonStyle, GatewayIntentBits, Routes } from 'discord-api-types/v10';
 import { MessageActionRowComponentBuilder } from '@discordjs/builders';
-import ms from 'ms';
+import { SeederService } from './seeder/seeder.service';
 
 import {
   DISCORD_BAN_REASON_ENUM,
-  DISCORD_BANS,
   DISCORD_CHANNELS,
-  DISCORD_CHANNELS_PROTECT,
   DISCORD_CROSS_CHAT_BOT,
   DISCORD_EMOJI,
   DISCORD_LOGS,
   DISCORD_MONK_ROLES,
   DISCORD_MONK_ROLES_BOOST_TITLES,
-  DISCORD_RAINON_HOME,
+  DISCORD_RAINON_HOME, DISCORD_REASON_BANS,
   DISCORD_RELATIONS,
   DISCORD_ROLES,
   DISCORD_SERVER_RENAME,
@@ -50,9 +49,9 @@ import {
   ActionRowBuilder,
   GuildTextBasedChannel,
   ButtonInteraction,
-  CacheType,
+  CacheType, Events, Partials,
 } from 'discord.js';
-import { SeederService } from './seeder/seeder.service';
+
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -115,17 +114,13 @@ export class AppService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap(): Promise<void> {
     try {
-      await this.seederService.init(false);
-
-/*      this.client = new Client({
+      this.client = new Client({
         partials: [Partials.User, Partials.Channel, Partials.GuildMember],
         intents: [
           GatewayIntentBits.GuildBans,
           GatewayIntentBits.Guilds,
           GatewayIntentBits.GuildMembers,
           GatewayIntentBits.GuildInvites,
-          GatewayIntentBits.GuildMessages,
-          GatewayIntentBits.MessageContent,
         ],
         presence: {
           status: 'online',
@@ -136,7 +131,9 @@ export class AppService implements OnApplicationBootstrap {
 
       // await this.loadCommands();
 
-      await this.bot();*/
+      await this.seederService.init(this.client, false);
+
+      // await this.bot();
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
     }
@@ -175,14 +172,7 @@ export class AppService implements OnApplicationBootstrap {
   private async loadStorage(): Promise<void> {
     const guildModeration = await this.guildsRepository.findOneBy({ name: 'Moder Chat' });
     const channelBanThread = await this.channelsRepository.findOneBy({ name: 'ban_list', guildId: guildModeration.id });
-    const channelCrossBanLog = await this.channelsRepository.findOneBy({ name: 'crossban', guildId: guildModeration.id })
-
-    const t = new DiscordStorage();
-
-    t.guilds.set('1', '2');
-
-    console.log(t)
-    // TODO request permission users
+    const channelCrossBanLog = await this.channelsRepository.findOneBy({ name: 'crossban', guildId: guildModeration.id });
   }
 
   async bot(): Promise<void> {
@@ -199,13 +189,8 @@ export class AppService implements OnApplicationBootstrap {
       if (!channel || channel.type !== ChannelType.GuildText) return;
       this.channel = channel as GuildTextBasedChannel;
 
-      this.collector = this.channel.createMessageComponentCollector({
-        filter: this.filterBan,
-        time: 5_000,
-      });
-
       this.client.on(
-        'interactionCreate',
+        Events.InteractionCreate,
         async (interaction: Interaction): Promise<void> => {
           if (!interaction.isCommand()) return;
 
@@ -232,51 +217,6 @@ export class AppService implements OnApplicationBootstrap {
           }
         },
       );
-
-      this.client.on('messageCreate', async (message) => {
-        try {
-          if (
-            DISCORD_SERVER_PROTECT.has(message.guildId) &&
-            DISCORD_CHANNELS_PROTECT.has(message.channelId) &&
-            message.guild.members.me.permissions.has(
-              PermissionsBitField.Flags.ManageMessages,
-              false,
-            )
-          ) {
-            if (
-              message.author.id === DISCORD_CROSS_CHAT_BOT &&
-              message.embeds.length
-            ) {
-              const [embedMessage] = message.embeds;
-
-              if (
-                embedMessage.description.includes('@here') ||
-                embedMessage.description.includes('@everyone') ||
-                embedMessage.description.includes('бесплатно') ||
-                embedMessage.description.includes('нитро')
-              ) {
-                await message.delete();
-              }
-            } else if (message.mentions.everyone) {
-              await message.delete();
-            } else if (message.content.includes('нитро')) {
-              await message.delete();
-            }
-          }
-        }
-
-        if (interaction.isCommand()) {
-          const command = this.commandsMessage.get(interaction.commandName);
-          if (!command) return;
-
-          try {
-            await command.executeInteraction({ interaction, redis: this.redisService, logger: this.logger });
-          } catch (errorException) {
-            this.logger.error(errorException);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-          }
-        }
-      });
 
       this.client.on(
         'guildMemberUpdate',
@@ -360,7 +300,7 @@ export class AppService implements OnApplicationBootstrap {
 
           if (
             guildBan.reason &&
-            DISCORD_BANS.has(guildBan.reason.toLowerCase())
+            DISCORD_REASON_BANS.has(guildBan.reason.toLowerCase())
           ) {
             const emojiEdit = this.client.emojis.cache.get(
               DISCORD_EMOJI.get(guildBan.guild.id),
@@ -409,6 +349,9 @@ export class AppService implements OnApplicationBootstrap {
         }
       });
 
+      /**
+       * @deprecated
+       */
       this.collector.on('collect', async (interaction) => {
         if (!!(await this.redisService.get(interaction.customId))) {
           const discordServer: Snowflake = DISCORD_RELATIONS.get(
@@ -429,9 +372,8 @@ export class AppService implements OnApplicationBootstrap {
               DISCORD_EMOJI.get(discordServer),
             );
 
-            const [embed] = interaction.message
-              .embeds as unknown as EmbedBuilder[];
-            const newEmbed = embed.addFields({
+            const [embed] = interaction.message.embeds;
+            const newEmbed = new EmbedBuilder(embed).addFields({
               name: '\u200B',
               value: `${emojiEdit} - ✅`,
               inline: true,
@@ -455,63 +397,6 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on(Events.GuildMemberAdd, async (guildMember) => {
         try {
-          if (
-            !guildMember.guild.members.me.permissions.has(
-              PermissionsBitField.Flags.BanMembers,
-              false,
-            )
-          )
-            return;
-
-          const shield: Record<string, string> =
-            await this.redisService.hgetall(`shield:${guildMember.guild.id}`);
-
-          if (shield.status === 'true') {
-            await this.redisService.set(
-              `s:${guildMember.guild.id}:${guildMember.user.id}`,
-              guildMember.user.id,
-              'EX',
-              ms(shield.time),
-            );
-
-            this.logger.log(
-              `guildMemberAdd: key s:${guildMember.guild.id}:${
-                guildMember.user.id
-              } added for ${ms(shield.time)}`,
-            );
-
-            const groupKeys = await this.redisService.keys(
-              `s:${guildMember.guild.id}:*`,
-            );
-            const joins: number = parseInt(shield.joins);
-            const groupLength: number = groupKeys.length;
-
-            this.logger.log(
-              `Server threshold joins: ${joins} Total group keys: ${groupLength}`,
-            );
-
-            if (groupLength === joins) {
-              for (const key of groupKeys) {
-                const id = await this.redisService.get(key);
-                if (!id) continue;
-
-                await guildMember.guild.members.ban(id, {
-                  reason: DISCORD_BAN_REASON_ENUM.shield_en,
-                });
-              }
-            }
-
-            if (groupLength > joins) {
-              const id = await this.redisService.get(
-                groupKeys[groupLength - 1],
-              );
-              if (id)
-                await guildMember.guild.members.ban(id, {
-                  reason: DISCORD_BAN_REASON_ENUM.shield_en,
-                });
-            }
-          }
-
           if (DISCORD_SERVER_RENAME.has(guildMember.guild.id)) {
             const oldUsername = guildMember.user.username;
             let username = guildMember.user.username;
@@ -556,7 +441,7 @@ export class AppService implements OnApplicationBootstrap {
    * @description
    * @param interaction
    */
-  private filterBan = async (interaction): Promise<boolean> => {
+/*  private filterBan = async (interaction): Promise<boolean> => {
     try {
       if (!!await this.redisService.get(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
         const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
@@ -571,5 +456,5 @@ export class AppService implements OnApplicationBootstrap {
       this.logger.error(`filterBan: ${errorOrException}`);
       return false;
     }
-  };
+  };*/
 }
