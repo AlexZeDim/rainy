@@ -1,3 +1,3 @@
-export * from './shield';
-export * from './massban';
-export * from './vote-unban';
+export * from './massban.command';
+export * from './vote-unban.command';
+export * from './whoami.command';

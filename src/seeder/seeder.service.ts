@@ -1,24 +1,44 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GuildsEntity, PermissionsEntity, RolesEntity, UserPermissionsEntity, UsersEntity } from '@app/pg';
+import {
+  ChannelsEntity,
+  GuildsEntity,
+  PermissionsEntity,
+  RolesEntity,
+  UserPermissionsEntity,
+  UsersEntity
+} from '@app/pg';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { Logger, ServiceUnavailableException } from '@nestjs/common';
-import { DISCORD_MONK_ROLES_BOOST_TITLES, DISCORD_RELATIONS, DISCORD_SERVERS_ENUM, SUBJECT_VECTOR } from '@app/shared';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import {
+  DISCORD_CHANNELS_ENUM,
+  DISCORD_GUILDS_ENUM,
+  DISCORD_MONK_ROLES_BOOST_TITLES,
+  DISCORD_RELATIONS,
+  DISCORD_SERVERS_ENUM,
+  StorageInterface,
+  SUBJECT_VECTOR
+} from '@app/shared';
 import { Client, Collection } from 'discord.js';
 import * as console from 'console';
 
+@Injectable()
 export class SeederService {
   private readonly logger = new Logger(SeederService.name, { timestamp: true });
   private client: Client;
   private guildStorage: Collection<string, GuildsEntity> = new Collection<string, GuildsEntity>();
   private userStorage: Collection<string, UsersEntity> = new Collection<string, UsersEntity>();
   private roleStorage: Collection<string, RolesEntity> = new Collection<string, RolesEntity>();
+  private channelStorage: Collection<string, ChannelsEntity> = new Collection<string, ChannelsEntity>();
+  private localStorage: StorageInterface;
   private userPermissionStorage: Collection<string, UserPermissionsEntity> = new Collection<string, UserPermissionsEntity>();
   constructor(
     @InjectRedis()
     private readonly redisService: Redis,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    @InjectRepository(ChannelsEntity)
+    private readonly channelsRepository: Repository<ChannelsEntity>,
     @InjectRepository(RolesEntity)
     private readonly rolesRepository: Repository<RolesEntity>,
     @InjectRepository(GuildsEntity)
@@ -30,10 +50,10 @@ export class SeederService {
   ) {}
 
   async init(client: Client, flushAll: boolean) {
-    this.logger.log('init started!');
+    this.logger.log('seeder started!');
 
     if (!client) {
-      throw new ServiceUnavailableException('Rainy client has not been initiated!')
+      throw new ServiceUnavailableException('Rainy client has not been initiated!');
     }
 
     if (flushAll) {
@@ -45,8 +65,22 @@ export class SeederService {
     await this.initGuilds();
     await this.initDiscordRoles();
     await this.initUserPermissions();
+    await this.initChannels();
 
-    this.logger.log('init ended!');
+    this.logger.log('seeder ended!');
+  }
+
+  /**
+   * @description Extract in-memory storage after init
+   */
+  public extract(): StorageInterface {
+    this.localStorage.guildStorage = this.guildStorage;
+    this.localStorage.userStorage = this.userStorage;
+    this.localStorage.roleStorage = this.roleStorage;
+    this.localStorage.channelStorage = this.channelStorage;
+    this.localStorage.userPermissionStorage = this.userPermissionStorage;
+
+    return this.localStorage;
   }
 
   async initGuilds() {
@@ -89,10 +123,22 @@ export class SeederService {
     }
   }
 
+  async initChannels() {
+    const guildModeration = await this.guildsRepository.findOneBy({ name: DISCORD_GUILDS_ENUM.ModerChat });
+
+    this.guildStorage.set(guildModeration.id, guildModeration);
+
+    const channelBanThread = await this.channelsRepository.findOneBy({ name: DISCORD_CHANNELS_ENUM.Core, guildId: guildModeration.id });
+    const channelCrossBanLog = await this.channelsRepository.findOneBy({ name: DISCORD_CHANNELS_ENUM.Logs, guildId: guildModeration.id });
+
+    this.channelStorage.set(channelBanThread.id, channelBanThread);
+    this.channelStorage.set(channelCrossBanLog.id, channelCrossBanLog);
+  }
+
   async initDiscordRoles() {
-    const guildEntityMonk = await this.guildsRepository.findOneBy({ name: 'Храм Пяти Рассветов' });
+    const guildEntityMonk = await this.guildsRepository.findOneBy({ name: DISCORD_GUILDS_ENUM.TempleOfFiveDawns });
     if (!guildEntityMonk) {
-      this.logger.log(`Guild Храм Пяти Рассветов not found!`);
+      this.logger.log(`Monk Discord not found!`);
       return;
     }
 
@@ -186,7 +232,7 @@ export class SeederService {
         await this.userPermissionsRepository.save(userPermissionEntity);
       }
 
-      this.userPermissionStorage.set(userPermissionEntity.uuid, userPermissionEntity);
+      this.userPermissionStorage.set(userPermissionEntity.userId, userPermissionEntity);
     }
   }
 }

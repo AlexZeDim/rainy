@@ -3,6 +3,8 @@ import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SeederService } from './seeder/seeder.service';
+import { TestService } from './test/test.service';
 import {
   ChannelsEntity,
   CoreUsersEntity,
@@ -12,7 +14,6 @@ import {
   UserPermissionsEntity,
   UsersEntity,
 } from '@app/pg';
-import { SeederService } from './seeder/seeder.service';
 
 @Module({
   imports: [
@@ -55,6 +56,6 @@ import { SeederService } from './seeder/seeder.service';
       },
     }),
   ],
-  providers: [AppService, SeederService],
+  providers: [AppService, SeederService, TestService],
 })
 export class AppModule {}

@@ -15,9 +15,10 @@ import { Repository } from 'typeorm';
 import { ButtonStyle, GatewayIntentBits, Routes } from 'discord-api-types/v10';
 import { MessageActionRowComponentBuilder } from '@discordjs/builders';
 import { SeederService } from './seeder/seeder.service';
+import { TestService } from './test/test.service';
 
 import {
-  DISCORD_CHANNELS,
+  DISCORD_CHANNELS, DISCORD_CHANNELS_ENUM,
   DISCORD_EMOJI,
   DISCORD_LOGS,
   DISCORD_MONK_ROLES,
@@ -28,7 +29,7 @@ import {
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
   ISlashCommand,
-  Massban,
+  Massban, StorageInterface, Whoami,
 } from '@app/shared';
 
 import {
@@ -37,7 +38,6 @@ import {
   TextChannel,
   Channel,
   Collection,
-  Interaction,
   GuildMember,
   PartialGuildMember,
   ButtonBuilder,
@@ -56,11 +56,9 @@ export class AppService implements OnApplicationBootstrap {
 
   private rainyUser: CoreUsersEntity;
 
-  private timeout: number = 1000 * 60 * 60 * 12;
-
   private channel: GuildTextBasedChannel;
 
-  private collector;
+  private localStorage: StorageInterface;
 
   private commandsMessage: Collection<string, ISlashCommand> = new Collection();
 
@@ -75,6 +73,8 @@ export class AppService implements OnApplicationBootstrap {
     private readonly redisService: Redis,
     @Inject(SeederService)
     private readonly seederService: SeederService,
+    @Inject(TestService)
+    private readonly testService: TestService,
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
     @InjectRepository(GuildsEntity)
@@ -101,11 +101,9 @@ export class AppService implements OnApplicationBootstrap {
 
       await this.loadRainy();
 
-      // await this.loadCommands();
+      await this.loadCommands();
 
-      await this.seederService.init(this.client, false);
-
-      // await this.bot();
+      await this.bot();
     } catch (errorOrException) {
       this.logger.error(`Application: ${errorOrException}`);
     }
@@ -117,7 +115,7 @@ export class AppService implements OnApplicationBootstrap {
         name: 'Rainy',
       });
 
-      if (!rainyUserEntity) throw new NotFoundException('Rainy not found!');
+      if (!rainyUserEntity) throw new NotFoundException(-'Rainy not found!');
 
       if (!rainyUserEntity.token)
         throw new NotFoundException('Rainy token not found!');
@@ -127,6 +125,10 @@ export class AppService implements OnApplicationBootstrap {
       await this.client.login(this.rainyUser.token);
 
       this.rest.setToken(this.rainyUser.token);
+
+      await this.seederService.init(this.client, false);
+
+      this.localStorage = this.seederService.extract();
     } catch (errorOrException) {
       this.logger.error(`loadOraculum: ${errorOrException}`);
     }
@@ -135,17 +137,12 @@ export class AppService implements OnApplicationBootstrap {
   private async loadCommands(): Promise<void> {
     this.commandsMessage.set(Massban.name, Massban);
     this.commandSlash.push(Massban.slashCommand.toJSON());
+    this.commandsMessage.set(Whoami.name, Whoami);
+    this.commandSlash.push(Whoami.slashCommand.toJSON());
 
     await this.rest.put(Routes.applicationCommands(this.client.user.id), {
       body: this.commandSlash,
     });
-  }
-
-  private async loadStorage(): Promise<void> {
-    // FIXME remove this shit
-    const guildModeration = await this.guildsRepository.findOneBy({ name: 'Moder Chat' });
-    const channelBanThread = await this.channelsRepository.findOneBy({ name: 'ban_list', guildId: guildModeration.id });
-    const channelCrossBanLog = await this.channelsRepository.findOneBy({ name: 'crossban', guildId: guildModeration.id });
   }
 
   async bot(): Promise<void> {
@@ -164,29 +161,68 @@ export class AppService implements OnApplicationBootstrap {
 
       this.client.on(
         Events.InteractionCreate,
-        async (interaction: Interaction): Promise<void> => {
-          if (!interaction.isCommand()) return;
+        async (interaction): Promise<void> => {
+          // TODO test permission users
+          // if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
+          if (this.localStorage.userPermissionStorage.has(interaction.user.id)) return;
 
-          if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
+          // TODO test find user connection to guild
+          //const guildId = DISCORD_RELATIONS.get(interaction.user.id);
+          const userPermissionsEntity = this.localStorage.userPermissionStorage.get(interaction.user.id);
+          if (userPermissionsEntity.guildId !== interaction.guild.id) {
+            // TODO reply back missing access to press button
+            return;
+          }
 
-          const guildId = DISCORD_RELATIONS.get(interaction.user.id);
-          if (guildId !== interaction.guild.id) return;
+          if (interaction.isButton()) {
+            const isBanExists = !!await this.redisService.get(interaction.customId);
+            if (isBanExists) {
+              /**
+               * @description Receive state of button clicked
+               * @description By each discord representative
+               */
+              const buttonClicked = await this.redisService.smembers(
+                `${interaction.customId}:button`,
+              );
 
-          const command = this.commandsMessage.get(interaction.commandName);
-          if (!command) return;
+              if (!buttonClicked.includes(userPermissionsEntity.guildId)) {
+                await this.redisService.sadd(
+                  `${interaction.customId}:button`,
+                  userPermissionsEntity.guildId,
+                );
 
-          try {
-            await command.executeInteraction({
-              interaction,
-              redis: this.redisService,
-              logger: this.logger,
-            });
-          } catch (errorException) {
-            this.logger.error(errorException);
-            await interaction.reply({
-              content: 'There was an error while executing this command!',
-              ephemeral: true,
-            });
+                const emojiEdit = this.client.emojis.cache.get(
+                  DISCORD_EMOJI.get(userPermissionsEntity.guildId),
+                );
+
+                const [embed] = interaction.message.embeds;
+                const newEmbed = new EmbedBuilder(embed).addFields({
+                  name: '\u200B',
+                  value: `${emojiEdit} - ✅`,
+                  inline: true,
+                });
+
+                await interaction.update({ embeds: [newEmbed] });
+              }
+            }
+          }
+
+          if (interaction.isCommand()) {
+            const command = this.commandsMessage.get(interaction.commandName);
+            if (!command) return;
+            try {
+              await command.executeInteraction({
+                interaction,
+                redis: this.redisService,
+                logger: this.logger,
+              });
+            } catch (errorException) {
+              this.logger.error(errorException);
+              await interaction.reply({
+                content: 'There was an error while executing this command!',
+                ephemeral: true,
+              });
+            }
           }
         },
       );
@@ -275,19 +311,20 @@ export class AppService implements OnApplicationBootstrap {
             guildBan.reason &&
             DISCORD_REASON_BANS.has(guildBan.reason.toLowerCase())
           ) {
-            const emojiEdit = this.client.emojis.cache.get(
+            const banOnGuildIcon = this.client.emojis.cache.get(
               DISCORD_EMOJI.get(guildBan.guild.id),
             );
-            const channel: Channel | null = await this.client.channels.fetch(
-              DISCORD_LOGS,
-            );
-            if (channel) {
-              await (channel as TextChannel).send(
-                `${guildBan.user.id} - ${emojiEdit} ${guildBan.guild.name}`,
+
+            const { id } = this.localStorage.channelStorage.get(DISCORD_CHANNELS_ENUM.Logs);
+            const channelBanLogs = await this.client.channels.fetch(id);
+            if (channelBanLogs && channelBanLogs.isTextBased) {
+              await (channelBanLogs as TextChannel).send(
+                `${guildBan.user.id} - ${banOnGuildIcon} ${guildBan.guild.name}`,
               );
             }
 
-            if (!(await this.redisService.get(guildBan.user.id))) {
+            const userBanExists = await this.redisService.get(guildBan.user.id);
+            if (!userBanExists) {
               const buttons = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                   .setCustomId(guildBan.user.id)
@@ -314,6 +351,7 @@ export class AppService implements OnApplicationBootstrap {
                 embeds: [embed],
                 components: [buttons],
               });
+
               await this.redisService.set(guildBan.user.id, message.id);
             }
           }
@@ -322,42 +360,7 @@ export class AppService implements OnApplicationBootstrap {
         }
       });
 
-      /**
-       * @deprecated
-       */
-      this.collector.on('collect', async (interaction) => {
-        if (!!(await this.redisService.get(interaction.customId))) {
-          const discordServer: Snowflake = DISCORD_RELATIONS.get(
-            interaction.user.id,
-          );
-
-          const pressed = await this.redisService.smembers(
-            `${interaction.customId}:button`,
-          );
-
-          if (!pressed.includes(discordServer)) {
-            await this.redisService.sadd(
-              `${interaction.customId}:button`,
-              discordServer,
-            );
-
-            const emojiEdit = this.client.emojis.cache.get(
-              DISCORD_EMOJI.get(discordServer),
-            );
-
-            const [embed] = interaction.message.embeds;
-            const newEmbed = new EmbedBuilder(embed).addFields({
-              name: '\u200B',
-              value: `${emojiEdit} - ✅`,
-              inline: true,
-            });
-
-            await interaction.update({ embeds: [newEmbed] });
-          }
-        }
-      });
-
-      this.client.on('guildBanRemove', async (ban) => {
+      this.client.on(Events.GuildBanRemove, async (ban) => {
         try {
           if (!!(await this.redisService.get(ban.user.id))) {
             await this.redisService.del(ban.user.id);
@@ -409,25 +412,4 @@ export class AppService implements OnApplicationBootstrap {
       this.logger.error(`Rainy: ${errorOrException}`);
     }
   }
-
-  /**
-   * @description
-   * @param interaction
-   */
-/*  private filterBan = async (interaction): Promise<boolean> => {
-    try {
-      if (!!await this.redisService.get(interaction.customId) && DISCORD_RELATIONS.has(interaction.user.id)) {
-        const discordClassID = DISCORD_RELATIONS.get(interaction.user.id);
-        const guild = this.client.guilds.cache.get(discordClassID);
-        if (guild) {
-          await guild.members.ban(interaction.customId, { reason: 'Cross Ban Rainy' });
-          return true;
-        }
-      }
-      return false;
-    } catch (errorOrException) {
-      this.logger.error(`filterBan: ${errorOrException}`);
-      return false;
-    }
-  };*/
 }
