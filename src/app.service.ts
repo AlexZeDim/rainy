@@ -18,25 +18,23 @@ import { SeederService } from './seeder/seeder.service';
 import { TestService } from './test/test.service';
 
 import {
-  DISCORD_CHANNELS, DISCORD_CHANNELS_ENUM,
+  DISCORD_CHANNELS_ENUM,
   DISCORD_EMOJI,
-  DISCORD_LOGS,
   DISCORD_MONK_ROLES,
   DISCORD_MONK_ROLES_BOOST_TITLES,
-  DISCORD_RAINON_HOME, DISCORD_REASON_BANS,
-  DISCORD_RELATIONS,
+  DISCORD_RAINON_HOME,
+  DISCORD_REASON_BANS,
   DISCORD_ROLES,
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
   ISlashCommand,
-  Massban, StorageInterface, Whoami,
+  Massban, Whoami,
+  StorageInterface
 } from '@app/shared';
 
 import {
   Client,
-  Snowflake,
   TextChannel,
-  Channel,
   Collection,
   GuildMember,
   PartialGuildMember,
@@ -45,7 +43,6 @@ import {
   PermissionsBitField,
   EmbedBuilder,
   ActionRowBuilder,
-  GuildTextBasedChannel,
   Events, Partials,
 } from 'discord.js';
 
@@ -56,7 +53,9 @@ export class AppService implements OnApplicationBootstrap {
 
   private rainyUser: CoreUsersEntity;
 
-  private channel: GuildTextBasedChannel;
+  private logsChannel: TextChannel;
+
+  private coreChannel: TextChannel;
 
   private localStorage: StorageInterface;
 
@@ -147,33 +146,31 @@ export class AppService implements OnApplicationBootstrap {
 
   async bot(): Promise<void> {
     try {
-      this.client.on('ready', async () =>
+      this.client.on(Events.ClientReady, async () =>
         this.logger.log(`Logged in as ${this.client.user.tag}!`),
       );
 
-      const channel = await this.client.channels.fetch(
-        DISCORD_CHANNELS.CrossChat_BanThread,
-      );
+      const channelCoreEntity = this.localStorage.channelStorage.get(DISCORD_CHANNELS_ENUM.Core);
+      this.coreChannel = await this.client.channels.fetch(channelCoreEntity.id) as TextChannel;
+
       const rainyHome = await this.client.guilds.fetch(DISCORD_RAINON_HOME);
 
-      if (!channel || channel.type !== ChannelType.GuildText) return;
-      this.channel = channel as GuildTextBasedChannel;
+      if (!this.coreChannel || this.coreChannel.type !== ChannelType.GuildText) return;
+
+      const channelLogsEntity = this.localStorage.channelStorage.get(DISCORD_CHANNELS_ENUM.Logs);
+      this.logsChannel = await this.client.channels.fetch(channelLogsEntity.id) as TextChannel;
+
+      if (!this.coreChannel || this.coreChannel.type !== ChannelType.GuildText) return;
 
       this.client.on(
         Events.InteractionCreate,
         async (interaction): Promise<void> => {
-          // TODO test permission users
-          // if (!DISCORD_RELATIONS.has(interaction.user.id)) return;
           if (this.localStorage.userPermissionStorage.has(interaction.user.id)) return;
 
-          // TODO test find user connection to guild
-          //const guildId = DISCORD_RELATIONS.get(interaction.user.id);
           const userPermissionsEntity = this.localStorage.userPermissionStorage.get(interaction.user.id);
-          if (userPermissionsEntity.guildId !== interaction.guild.id) {
-            // TODO reply back missing access to press button
-            return;
-          }
-
+          /**
+           * @description IF button is pressed
+           */
           if (interaction.isButton()) {
             const isBanExists = !!await this.redisService.get(interaction.customId);
             if (isBanExists) {
@@ -203,6 +200,34 @@ export class AppService implements OnApplicationBootstrap {
                 });
 
                 await interaction.update({ embeds: [newEmbed] });
+
+                const guildCacheExists = this.client.guilds.cache.has(userPermissionsEntity.guildId);
+                if (!guildCacheExists) {
+                  this.logger.log(`Permissions for user ${interaction.user.id} is exists, but guild ${userPermissionsEntity.guildId} doesn't provided in cache`);
+                  this.logger.log(`Trying to fetch guild ${userPermissionsEntity.guildId}...`);
+
+                  try {
+                    const guild = await this.client.guilds.fetch(userPermissionsEntity.guildId);
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
+                  } catch (errorOrException) {
+                    this.logger.error(`Unable to fetch guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);
+                    console.error(errorOrException);
+                  } finally {
+                    await interaction.reply({ ephemeral: true, content: `Представитель дискорда с ID ${userPermissionsEntity.guildId} забанил пользователя с ID ${interaction.customId}` });
+                  }
+                } else {
+                  const guild = this.client.guilds.cache.get(userPermissionsEntity.guildId);
+                  try {
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
+                  } catch (errorOrException) {
+                    this.logger.error(`Unable to ban user ${interaction.customId} at guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);
+                    console.error(errorOrException);
+                  }
+                }
+              } else {
+                await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы уже забанили пользователя с ID ${interaction.customId}` });
               }
             }
           }
@@ -346,7 +371,7 @@ export class AppService implements OnApplicationBootstrap {
                   inline: true,
                 });
 
-              const message = await this.channel.send({
+              const message = await this.logsChannel.send({
                 content: `!ban ${guildBan.user.id} CrossBan`,
                 embeds: [embed],
                 components: [buttons],

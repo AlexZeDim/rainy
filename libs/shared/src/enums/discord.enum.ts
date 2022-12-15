@@ -93,19 +93,6 @@ export enum DISCORD_ROLES {
   Supported = '696951702758227998',
 }
 
-export enum DISCORD_CHANNELS {
-  CrossChat_BanThread = '895301502485270618',
-  Mage_CrossAddons = '425733622427942922',
-  Monk_CrossAddons = '425566534350405654',
-  Paladin_CrossAddons = '425243919530590209',
-  Druid_CrossAddons = '426146087217266689',
-  Druid_CrossChat = '425328722258952194',
-  Priest_CrossChat = '891025625106776124',
-  Priest_CrossAddons = '891027804928475217',
-  Rogue_CrossChat = '425214451839402004',
-  Rogue_CrossAddons = '425569744075227136',
-}
-
 export enum DISCORD_MONK_ROLES {
   Boost1 = '965298855883210802',
   Boost2 = '965299002839040000',
