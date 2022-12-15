@@ -1,15 +1,9 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  ChannelsEntity,
-  GuildsEntity,
-  PermissionsEntity,
-  RolesEntity,
-  UserPermissionsEntity,
-  UsersEntity
-} from '@app/pg';
+import { Client, Collection } from 'discord.js';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+
 import {
   DISCORD_CHANNELS_ENUM,
   DISCORD_GUILDS_ENUM,
@@ -19,8 +13,16 @@ import {
   StorageInterface,
   SUBJECT_VECTOR
 } from '@app/shared';
-import { Client, Collection } from 'discord.js';
-import * as console from 'console';
+
+import {
+  ChannelsEntity,
+  GuildsEntity,
+  PermissionsEntity,
+  RolesEntity,
+  UserPermissionsEntity,
+  UsersEntity
+} from '@app/pg';
+
 
 @Injectable()
 export class SeederService {

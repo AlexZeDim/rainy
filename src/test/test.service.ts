@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ActionRowBuilder, ButtonBuilder, Client, EmbedBuilder, Events, TextChannel } from 'discord.js';
 import { ButtonStyle } from 'discord-api-types/v10';
 import { MessageActionRowComponentBuilder } from '@discordjs/builders';
-import { DISCORD_EMOJI } from '@app/shared';
 
 @Injectable()
 export class TestService {
