@@ -3,7 +3,17 @@ import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app/pg';
+import { SeederService } from './seeder/seeder.service';
+import { TestService } from './test/test.service';
+import {
+  ChannelsEntity,
+  CoreUsersEntity,
+  GuildsEntity,
+  PermissionsEntity,
+  RolesEntity,
+  UserPermissionsEntity,
+  UsersEntity,
+} from '@app/pg';
 
 @Module({
   imports: [
@@ -19,7 +29,10 @@ import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app
         ChannelsEntity,
         GuildsEntity,
         UsersEntity,
+        RolesEntity,
         CoreUsersEntity,
+        PermissionsEntity,
+        UserPermissionsEntity,
       ],
       synchronize: false,
       keepConnectionAlive: true,
@@ -29,7 +42,10 @@ import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app
       ChannelsEntity,
       GuildsEntity,
       UsersEntity,
+      RolesEntity,
       CoreUsersEntity,
+      PermissionsEntity,
+      UserPermissionsEntity,
     ]),
     ScheduleModule.forRoot(),
     RedisModule.forRoot({
@@ -40,6 +56,6 @@ import { ChannelsEntity, CoreUsersEntity, GuildsEntity, UsersEntity } from '@app
       },
     }),
   ],
-  providers: [AppService],
+  providers: [AppService, SeederService, TestService],
 })
 export class AppModule {}

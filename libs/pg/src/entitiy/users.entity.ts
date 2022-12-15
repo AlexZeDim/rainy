@@ -1,11 +1,18 @@
-import { GuildsEntity, TABLE_ENTITY_ENUM } from '@app/pg';
-import { CoreUsersEntity } from "@app/pg/entitiy/core-users.entity";
+import {
+  CoreUsersEntity,
+  GuildsEntity,
+  TABLE_ENTITY_ENUM,
+  UserPermissionsEntity,
+} from '@app/pg';
+
 import {
   Column,
   CreateDateColumn,
-  Entity, Index,
+  Entity,
+  Index,
   JoinColumn,
-  OneToMany, OneToOne,
+  OneToMany,
+  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -60,6 +67,12 @@ export class UsersEntity {
   @OneToMany(() => GuildsEntity, (guild: GuildsEntity) => guild.ownerUser)
   @JoinColumn({ name: 'id' })
   ownerGuilds: GuildsEntity[];
+
+  @OneToMany(
+    () => UserPermissionsEntity,
+    (userPermissions) => userPermissions.user,
+  )
+  userPermissions: UserPermissionsEntity[];
 
   @OneToOne(() => CoreUsersEntity, (coreUser) => coreUser.user)
   coreUser: CoreUsersEntity;

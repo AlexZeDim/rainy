@@ -1,3 +1,14 @@
+
+export enum DISCORD_GUILDS_ENUM {
+  TempleOfFiveDawns = 'Храм Пяти Рассветов',
+  ModerChat = 'Moder Chat',
+}
+
+export enum DISCORD_CHANNELS_ENUM {
+  Logs = 'crossban',
+  Core = 'ban_list'
+}
+
 export enum DISCORD_SERVERS_ENUM {
   SanctumOfLight = '210643527472906241',
   TempleOfFiveDawns = '217529277489479681',
@@ -28,8 +39,6 @@ export enum DISCORD_BAN_REASON_ENUM {
   scam_ru = 'скам',
   trash_en = 'trash',
   trash_ru = 'мусор',
-  shield_ru = 'щит',
-  shield_en = 'shield',
 }
 
 export enum DISCORD_AUTHORIZED_ENUM {
@@ -82,19 +91,6 @@ export enum DISCORD_ROLES {
   PaladinMember = '886198703495475220',
   MoteOfLight = '766136598579380285',
   Supported = '696951702758227998',
-}
-
-export enum DISCORD_CHANNELS {
-  CrossChat_BanThread = '895301502485270618',
-  Mage_CrossAddons = '425733622427942922',
-  Monk_CrossAddons = '425566534350405654',
-  Paladin_CrossAddons = '425243919530590209',
-  Druid_CrossAddons = '426146087217266689',
-  Druid_CrossChat = '425328722258952194',
-  Priest_CrossChat = '891025625106776124',
-  Priest_CrossAddons = '891027804928475217',
-  Rogue_CrossChat = '425214451839402004',
-  Rogue_CrossAddons = '425569744075227136',
 }
 
 export enum DISCORD_MONK_ROLES {

@@ -1,17 +1,15 @@
-import { Snowflake } from "discord.js";
+import { Snowflake } from 'discord.js';
 import {
   DISCORD_AUTHORIZED_ENUM,
   DISCORD_BAN_REASON_ENUM,
-  DISCORD_CHANNELS,
   DISCORD_MONK_ROLES,
   DISCORD_SERVER_RENAME_ENUM,
   DISCORD_SERVERS_ENUM,
-} from "@app/shared/enums";
+} from '@app/shared/enums';
 
 /**
- * @deprecated TODO rework based on pg relations
+ * TODO rework based on pg relations
  */
-
 export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.SanctumOfLight, '741997711678636074'],
   [DISCORD_SERVERS_ENUM.TempleOfFiveDawns, '741997711926100018'],
@@ -24,7 +22,7 @@ export const DISCORD_EMOJI: Map<Snowflake, Snowflake> = new Map([
   [DISCORD_SERVERS_ENUM.HallOfTheGuardian, '741997711955460116'],
   [DISCORD_SERVERS_ENUM.SkyholdCitadel, '741997711775236127'],
   [DISCORD_SERVERS_ENUM.TempleOfVoidLight, '741997711854665798'],
-  [DISCORD_SERVERS_ENUM.HallOfShadows, '741997712198860870']
+  [DISCORD_SERVERS_ENUM.HallOfShadows, '741997712198860870'],
 ]);
 
 export const DISCORD_RELATIONS: Map<string, string> = new Map([
@@ -62,16 +60,9 @@ export const DISCORD_RELATIONS: Map<string, string> = new Map([
   [DISCORD_AUTHORIZED_ENUM.Darkcat, DISCORD_SERVERS_ENUM.HallOfShadows],
 ]);
 
-export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(Object.values(DISCORD_SERVER_RENAME_ENUM));
-
-export const DISCORD_SERVER_PROTECT: Set<Snowflake> = new Set([
-  DISCORD_SERVERS_ENUM.SanctumOfLight,
-  DISCORD_SERVERS_ENUM.TempleOfFiveDawns,
-  DISCORD_SERVERS_ENUM.HallOfTheGuardian,
-  DISCORD_SERVERS_ENUM.DreamGroove,
-  DISCORD_SERVERS_ENUM.HallOfTheGuardian,
-  DISCORD_SERVERS_ENUM.TempleOfVoidLight,
-]);
+export const DISCORD_SERVER_RENAME: Set<Snowflake> = new Set(
+  Object.values(DISCORD_SERVER_RENAME_ENUM),
+);
 
 export const DISCORD_MONK_ROLES_BOOST_TITLES: Set<Snowflake> = new Set([
   DISCORD_MONK_ROLES.Boost1,
@@ -81,21 +72,9 @@ export const DISCORD_MONK_ROLES_BOOST_TITLES: Set<Snowflake> = new Set([
   DISCORD_MONK_ROLES.Boost5,
 ]);
 
-export const DISCORD_CHANNELS_PROTECT: Set<Snowflake> = new Set([
-  DISCORD_CHANNELS.Mage_CrossAddons,
-  DISCORD_CHANNELS.Monk_CrossAddons,
-  DISCORD_CHANNELS.Paladin_CrossAddons,
-  DISCORD_CHANNELS.Druid_CrossChat,
-  DISCORD_CHANNELS.Druid_CrossAddons,
-  DISCORD_CHANNELS.Priest_CrossAddons,
-  DISCORD_CHANNELS.Priest_CrossChat,
-  DISCORD_CHANNELS.Rogue_CrossChat,
-  DISCORD_CHANNELS.Rogue_CrossAddons,
-]);
-
 export const DISCORD_CROSS_CHAT_BOT: Snowflake = '891021899172286555';
 
-export const DISCORD_BANS: Set<string> = new Set(Object.values(DISCORD_BAN_REASON_ENUM));
+export const DISCORD_REASON_BANS: Set<string> = new Set(Object.values(DISCORD_BAN_REASON_ENUM));
 
 export const DISCORD_LOGS: Snowflake = '896513694488477767';
 
