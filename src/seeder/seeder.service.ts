@@ -23,7 +23,6 @@ import {
   UsersEntity
 } from '@app/pg';
 
-
 @Injectable()
 export class SeederService {
   private readonly logger = new Logger(SeederService.name, { timestamp: true });
