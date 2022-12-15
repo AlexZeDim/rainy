@@ -45,7 +45,6 @@ import {
   ActionRowBuilder,
   Events, Partials,
 } from 'discord.js';
-import { Octokit } from 'octokit';
 
 
 @Injectable()
@@ -130,7 +129,7 @@ export class AppService implements OnApplicationBootstrap {
 
       this.localStorage = this.seederService.extract();
     } catch (errorOrException) {
-      this.logger.error(`loadOraculum: ${errorOrException}`);
+      this.logger.error(`loadRainy: ${errorOrException}`);
     }
   }
 

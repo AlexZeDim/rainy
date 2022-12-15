@@ -11,14 +11,14 @@ export const Ban: ISlashCommand = {
     .setName('ban')
     .setDescription('Ban user(s) by their snowflake IDs')
     .addStringOption((option) =>
+      option.setName('snowflakes')
+        .setDescription('804648109866876998 804648321146421268 804648260467294259')
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
       option.setName('reason')
         .setDescription('Spam')
         .setRequired(false)
-    )
-    .addStringOption((option) =>
-      option.setName('snowflakes')
-      .setDescription('804648109866876998 804648321146421268 804648260467294259')
-      .setRequired(true)
     ),
 
   async executeInteraction({ interaction }: ISlashCommandArgs): Promise<void> {

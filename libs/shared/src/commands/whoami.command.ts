@@ -3,7 +3,6 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { EmbedBuilder } from 'discord.js';
 import { Octokit } from 'octokit';
 
-
 export const Whoami: ISlashCommand = {
   name: 'whoami',
   description: 'Show creation info',
