@@ -26,7 +26,7 @@ export const Whoami: ISlashCommand = {
       };
 
       const { data: repo } = await octokit.request("GET /repos/{owner}/{repo}", rainyRepo);
-      const { data: contributors } = await octokit.request("GET /repos/{owner}/{repo}/contributors/commits", rainyRepo);
+      const { data: contributors } = await octokit.request("GET /repos/{owner}/{repo}/contributors", rainyRepo);
 
       const embed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -41,10 +41,10 @@ export const Whoami: ISlashCommand = {
       embed.setThumbnail(topContributor.avatar_url);
 
       for (const { login, url, contributions } of contributors) {
-        embed.addFields({ name: contributions, value: `[${login}](${url})`, inline: true })
+        embed.addFields({ name: `${contributions}`, value: `[${login}](${url})`, inline: true })
       }
 
-      interaction.channel.send({ embeds: [ embed ]});
+      interaction.reply({ embeds: [ embed ], ephemeral: false });
     } catch (errorOrException) {
       console.error(errorOrException);
       await interaction.reply({
