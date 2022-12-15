@@ -1,6 +1,6 @@
 import { ISlashCommand, ISlashCommandArgs } from '@app/shared';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Collection, EmbedBuilder, Message, Utils } from 'discord.js';
+import { Collection } from 'discord.js';
 
 export const Clearance: ISlashCommand = {
   name: 'clearance',
@@ -8,13 +8,7 @@ export const Clearance: ISlashCommand = {
   guildOnly: true,
   slashCommand: new SlashCommandBuilder()
     .setName('clearance')
-    .setNameLocalizations({
-      ru: 'Доступы',
-    })
-    .setDescription('Show users with clearance to interact with bot')
-    .setDescriptionLocalizations({
-      ru: 'Показывает лист доступов для управления ботом',
-    }),
+    .setDescription('Show users with clearance to interact with bot'),
 
   async executeInteraction({ interaction, localStorage }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;

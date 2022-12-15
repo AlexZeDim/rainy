@@ -9,29 +9,15 @@ export const Ban: ISlashCommand = {
   guildOnly: true,
   slashCommand: new SlashCommandBuilder()
     .setName('ban')
-    .setNameLocalizations({
-      ru: 'Бан',
-    })
     .setDescription('Ban user(s) by their snowflake IDs')
-    .setDescriptionLocalizations({
-      ru: 'Забанить выбранных пользователей по их ID или тэгу',
-    })
     .addStringOption((option) =>
       option.setName('reason')
-        .setNameLocalizations({
-          ru: 'причина',
-        })
         .setDescription('Spam')
-        .setDescriptionLocalizations({
-          ru: 'Спам',
-        })
-        .setMaxLength(16)
         .setRequired(false)
     )
     .addStringOption((option) =>
       option.setName('snowflakes')
       .setDescription('804648109866876998 804648321146421268 804648260467294259')
-      .setMaxLength(1999)
       .setRequired(true)
     ),
 

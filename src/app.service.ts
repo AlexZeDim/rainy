@@ -28,8 +28,8 @@ import {
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
   ISlashCommand,
-  Ban, Whoami,
-  StorageInterface
+  Ban, Whoami, Clearance,
+  StorageInterface,
 } from '@app/shared';
 
 import {
@@ -45,6 +45,7 @@ import {
   ActionRowBuilder,
   Events, Partials,
 } from 'discord.js';
+import { Octokit } from 'octokit';
 
 
 @Injectable()
@@ -138,6 +139,8 @@ export class AppService implements OnApplicationBootstrap {
     this.commandSlash.push(Ban.slashCommand.toJSON());
     this.commandsMessage.set(Whoami.name, Whoami);
     this.commandSlash.push(Whoami.slashCommand.toJSON());
+    this.commandsMessage.set(Clearance.name, Clearance);
+    this.commandSlash.push(Clearance.slashCommand.toJSON());
 
     await this.rest.put(Routes.applicationCommands(this.client.user.id), {
       body: this.commandSlash,
