@@ -28,7 +28,7 @@ import {
   DISCORD_SERVER_RENAME,
   DISCORD_SERVERS_ENUM,
   ISlashCommand,
-  Massban, Whoami,
+  Ban, Whoami,
   StorageInterface
 } from '@app/shared';
 
@@ -134,8 +134,8 @@ export class AppService implements OnApplicationBootstrap {
   }
 
   private async loadCommands(): Promise<void> {
-    this.commandsMessage.set(Massban.name, Massban);
-    this.commandSlash.push(Massban.slashCommand.toJSON());
+    this.commandsMessage.set(Ban.name, Ban);
+    this.commandSlash.push(Ban.slashCommand.toJSON());
     this.commandsMessage.set(Whoami.name, Whoami);
     this.commandSlash.push(Whoami.slashCommand.toJSON());
 
@@ -238,6 +238,7 @@ export class AppService implements OnApplicationBootstrap {
             try {
               await command.executeInteraction({
                 interaction,
+                localStorage: this.localStorage,
                 redis: this.redisService,
                 logger: this.logger,
               });
