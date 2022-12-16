@@ -15,7 +15,6 @@ export const Whoami: ISlashCommand = {
     if (!interaction.isChatInputCommand()) return;
 
     try {
-
       const octokit = new Octokit({
         auth: process.env.GITHUB_TOKEN
       });
