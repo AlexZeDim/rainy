@@ -171,7 +171,7 @@ export class AppService implements OnApplicationBootstrap {
            * @description IF button is pressed
            */
           if (interaction.isButton()) {
-            if (this.localStorage.userPermissionStorage.has(interaction.user.id)) {
+            if (!this.localStorage.userPermissionStorage.has(interaction.user.id)) {
               await interaction.reply({ ephemeral: true, content: `У вас нет доступа к использованию команд` });
               return;
             }
