@@ -214,7 +214,7 @@ export class AppService implements OnApplicationBootstrap {
 
                   try {
                     const guild = await this.client.guilds.fetch(userPermissionsEntity.guildId);
-                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 604800 });
                     await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
                   } catch (errorOrException) {
                     this.logger.error(`Unable to fetch guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);
@@ -225,7 +225,7 @@ export class AppService implements OnApplicationBootstrap {
                 } else {
                   const guild = this.client.guilds.cache.get(userPermissionsEntity.guildId);
                   try {
-                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 604800 });
                     await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
                   } catch (errorOrException) {
                     this.logger.error(`Unable to ban user ${interaction.customId} at guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);

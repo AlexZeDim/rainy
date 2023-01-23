@@ -20,7 +20,7 @@ If bot doesn't rename the user and your server mentioned in rename list, mainly 
 If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free to use.
 
 
-## Contributon & Issues policy.
+## Contributions & Issues policy.
 
 We are very glad to hear any relevant proposal or any kind of contribution from you. 
 
