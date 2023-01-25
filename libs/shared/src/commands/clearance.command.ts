@@ -1,6 +1,6 @@
 import { ISlashCommand, ISlashCommandArgs } from '@app/shared';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Collection } from 'discord.js';
+import { Collection, EmbedBuilder } from 'discord.js';
 
 export const Clearance: ISlashCommand = {
   name: 'clearance',
@@ -14,27 +14,55 @@ export const Clearance: ISlashCommand = {
     if (!interaction.isChatInputCommand()) return;
     try {
 
-      let message: string;
-      const messageMap = new Collection<string, string>();
+      const messageMap = new Collection<string, Set<string>>();
 
       for (const userPermission of localStorage.userPermissionStorage.values()) {
         const user =  localStorage.userStorage.get(userPermission.userId);
         const guild = localStorage.guildStorage.get(userPermission.guildId);
 
         if (messageMap.has(guild.name)) {
-          const userString = messageMap.get(guild.name);
+          const userSet = messageMap.get(guild.name);
 
-          messageMap.set(guild.name, `\n${userString}\n\n`);
+          userSet.add(`${user.username} | ${user.id}`);
+
+          messageMap.set(guild.name, userSet);
         } else {
-          messageMap.set(guild.name, `${user.username} | ${user.id}\n\n`);
+          const userSet = new Set<string>([`${user.username} | ${user.id}`]);
+
+          messageMap.set(guild.name, userSet);
         }
       }
 
-      for (const [guildName, userString] of messageMap.entries()) {
-        message = `${message}${guildName}${userString}`;
-      }
+      for (const [guildName, userSet] of messageMap.entries()) {
+        let counter = 0;
+        const embed = new EmbedBuilder().setDescription(guildName);
 
-      await interaction.channel.send({ content: message });
+        userSet.forEach((user) => {
+          counter++
+
+          if (counter < 12) {
+            embed.addFields({
+              name: '\u200B',
+              value: user,
+              inline: true,
+            });
+          }
+
+          if (counter === 12) {
+            const length = userSet.size - counter;
+
+            embed.addFields({
+              name: '\u200B',
+              value: `...and ${length} more!`,
+              inline: true,
+            });
+
+            return;
+          }
+        })
+
+        await interaction.channel.send({ embeds: [embed] });
+      }
     } catch (errorOrException) {
       console.error(errorOrException);
       await interaction.reply({

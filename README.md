@@ -1,6 +1,10 @@
 # Rainy
 
-<a href="https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot" class="button big">INVITE TO DISCORD</a>
+<p align="center">
+  <img src="https://i.imgur.com/OZqzhli.png" width="200" alt="CMNW Logo" />
+</p>
+
+## [INVITE TO DISCORD](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)
 
 Rainy was born as a small discord bot, that handles only one problem, checking and renaming every user on join. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` ❤️ `Janisse`. She was co-manager of [**Monk's Temple of Five Dawns**,](https://discord.com/invite/fYSNb5U) and he is founder of [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft.
 
@@ -16,7 +20,7 @@ If bot doesn't rename the user and your server mentioned in rename list, mainly 
 If you want to add Rainy to your discord server, please use **[the following link](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)**. Feel free to use.
 
 
-## Contributon & Issues policy.
+## Contributions & Issues policy.
 
 We are very glad to hear any relevant proposal or any kind of contribution from you. 
 

@@ -167,13 +167,17 @@ export class AppService implements OnApplicationBootstrap {
       this.client.on(
         Events.InteractionCreate,
         async (interaction): Promise<void> => {
-          if (this.localStorage.userPermissionStorage.has(interaction.user.id)) return;
-
-          const userPermissionsEntity = this.localStorage.userPermissionStorage.get(interaction.user.id);
           /**
            * @description IF button is pressed
            */
           if (interaction.isButton()) {
+            if (!this.localStorage.userPermissionStorage.has(interaction.user.id)) {
+              await interaction.reply({ ephemeral: true, content: `У вас нет доступа к использованию команд` });
+              return;
+            }
+
+            const userPermissionsEntity = this.localStorage.userPermissionStorage.get(interaction.user.id);
+
             const isBanExists = !!await this.redisService.get(interaction.customId);
             if (isBanExists) {
               /**
@@ -210,7 +214,7 @@ export class AppService implements OnApplicationBootstrap {
 
                   try {
                     const guild = await this.client.guilds.fetch(userPermissionsEntity.guildId);
-                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 604800 });
                     await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
                   } catch (errorOrException) {
                     this.logger.error(`Unable to fetch guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);
@@ -221,7 +225,7 @@ export class AppService implements OnApplicationBootstrap {
                 } else {
                   const guild = this.client.guilds.cache.get(userPermissionsEntity.guildId);
                   try {
-                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 1000 * 60 * 60 * 24 });
+                    await guild.members.ban(interaction.customId, { deleteMessageSeconds: 604800 });
                     await interaction.reply({ ephemeral: true, content: `Как представитель дискорда с ID ${userPermissionsEntity.guildId} вы забанили пользователя с ID ${interaction.customId}` });
                   } catch (errorOrException) {
                     this.logger.error(`Unable to ban user ${interaction.customId} at guild ${userPermissionsEntity.guildId} on ban stage, seems it's Missing Access or out of our reach`);
@@ -235,9 +239,15 @@ export class AppService implements OnApplicationBootstrap {
           }
 
           if (interaction.isCommand()) {
-            const command = this.commandsMessage.get(interaction.commandName);
-            if (!command) return;
             try {
+              if (this.localStorage.userPermissionStorage.has(interaction.user.id)) {
+                await interaction.reply({ ephemeral: true, content: `У вас нет доступа к использованию команд` });
+                return;
+              }
+
+              const command = this.commandsMessage.get(interaction.commandName);
+              if (!command) return;
+
               await command.executeInteraction({
                 interaction,
                 localStorage: this.localStorage,
@@ -256,7 +266,7 @@ export class AppService implements OnApplicationBootstrap {
       );
 
       this.client.on(
-        'guildMemberUpdate',
+        Events.GuildMemberUpdate,
         async (
           oldMember: GuildMember | PartialGuildMember,
           newMember: GuildMember,
@@ -374,13 +384,35 @@ export class AppService implements OnApplicationBootstrap {
                   inline: true,
                 });
 
-              const message = await this.logsChannel.send({
+              const message = await this.coreChannel.send({
                 content: `!ban ${guildBan.user.id} CrossBan`,
                 embeds: [embed],
                 components: [buttons],
               });
 
               await this.redisService.set(guildBan.user.id, message.id);
+            } else {
+              const message = await this.coreChannel.messages.fetch(userBanExists);
+              if (message && message.embeds) {
+                const [embed] = message.embeds;
+
+                const emoji = this.client.emojis.cache.get(
+                  DISCORD_EMOJI.get(guildBan.guild.id),
+                );
+
+                const newEmbed = new EmbedBuilder(embed).addFields({
+                  name: '\u200B',
+                  value: `${emoji} - ✅`,
+                  inline: true,
+                });
+
+                await message.edit({ embeds: [newEmbed] });
+
+                await this.redisService.sadd(
+                  `${guildBan.user.id}:button`,
+                  guildBan.guild.id,
+                );
+              }
             }
           }
         } catch (errorOrException) {
