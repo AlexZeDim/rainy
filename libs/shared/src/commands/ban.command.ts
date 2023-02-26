@@ -11,22 +11,25 @@ export const Ban: ISlashCommand = {
     .setName('ban')
     .setDescription('Ban user(s) by their snowflake IDs')
     .addStringOption((option) =>
-      option.setName('snowflakes')
-        .setDescription('804648109866876998 804648321146421268 804648260467294259')
-        .setRequired(true)
+      option
+        .setName('snowflakes')
+        .setDescription(
+          '804648109866876998 804648321146421268 804648260467294259',
+        )
+        .setRequired(true),
     )
     .addStringOption((option) =>
-      option.setName('reason')
-        .setDescription('Spam')
-        .setRequired(false)
+      option.setName('reason').setDescription('Spam').setRequired(false),
     ),
 
   async executeInteraction({ interaction }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
     try {
       let counter = 0;
-      const reason = interaction.options.getString('reason', false) || DISCORD_BAN_REASON_ENUM.spam_en;
       const snowflakes = interaction.options.getString('snowflake', true);
+      const reason =
+        interaction.options.getString('reason', false) ||
+        DISCORD_BAN_REASON_ENUM.spam_en;
 
       const snowflakesBan: Snowflake[] = snowflakes
         .replace(/\n/g, ' ')
@@ -39,13 +42,15 @@ export const Ban: ISlashCommand = {
           false,
         )
       ) {
-        throw new Error(`Rainy doesn't have permission to ban users at ${interaction.guildId}`);
+        throw new Error(
+          `Rainy doesn't have permission to ban users at ${interaction.guildId}`,
+        );
       }
 
       for (const snowflake of snowflakesBan) {
         try {
           await interaction.guild.members.ban(snowflake, { reason });
-          counter++
+          counter++;
         } catch (e) {
           await interaction.reply({
             content: `User ${snowflake} not banned. Probably missing access to ban.`,

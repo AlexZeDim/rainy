@@ -1,5 +1,11 @@
 import { Collection } from 'discord.js';
-import { ChannelsEntity, GuildsEntity, RolesEntity, UserPermissionsEntity, UsersEntity } from '@app/pg';
+import {
+  ChannelsEntity,
+  GuildsEntity,
+  RolesEntity,
+  UserPermissionsEntity,
+  UsersEntity,
+} from '@app/pg';
 
 export interface StorageInterface {
   guildStorage: Collection<string, GuildsEntity>;

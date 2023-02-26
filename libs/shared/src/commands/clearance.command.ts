@@ -1,6 +1,6 @@
 import { ISlashCommand, ISlashCommandArgs } from '@app/shared';
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { Collection, EmbedBuilder } from 'discord.js';
+import { Collection, EmbedBuilder, TextChannel } from 'discord.js';
 
 export const Clearance: ISlashCommand = {
   name: 'clearance',
@@ -10,14 +10,16 @@ export const Clearance: ISlashCommand = {
     .setName('clearance')
     .setDescription('Show users with clearance to interact with bot'),
 
-  async executeInteraction({ interaction, localStorage }: ISlashCommandArgs): Promise<void> {
+  async executeInteraction({
+    interaction,
+    localStorage,
+  }: ISlashCommandArgs): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
     try {
-
       const messageMap = new Collection<string, Set<string>>();
 
       for (const userPermission of localStorage.userPermissionStorage.values()) {
-        const user =  localStorage.userStorage.get(userPermission.userId);
+        const user = localStorage.userStorage.get(userPermission.userId);
         const guild = localStorage.guildStorage.get(userPermission.guildId);
 
         if (messageMap.has(guild.name)) {
@@ -38,7 +40,7 @@ export const Clearance: ISlashCommand = {
         const embed = new EmbedBuilder().setDescription(guildName);
 
         userSet.forEach((user) => {
-          counter++
+          counter++;
 
           if (counter < 12) {
             embed.addFields({
@@ -59,9 +61,9 @@ export const Clearance: ISlashCommand = {
 
             return;
           }
-        })
+        });
 
-        await interaction.channel.send({ embeds: [embed] });
+        await (interaction.channel as TextChannel).send({ embeds: [embed] });
       }
     } catch (errorOrException) {
       console.error(errorOrException);
@@ -70,5 +72,5 @@ export const Clearance: ISlashCommand = {
         ephemeral: true,
       });
     }
-  }
-}
+  },
+};

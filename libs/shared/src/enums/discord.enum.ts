@@ -1,4 +1,3 @@
-
 export enum DISCORD_GUILDS_ENUM {
   TempleOfFiveDawns = 'Храм Пяти Рассветов',
   ModerChat = 'Moder Chat',
@@ -6,7 +5,7 @@ export enum DISCORD_GUILDS_ENUM {
 
 export enum DISCORD_CHANNELS_ENUM {
   Logs = 'crossban',
-  Core = 'ban_list'
+  Core = 'ban_list',
 }
 
 export enum DISCORD_SERVERS_ENUM {
