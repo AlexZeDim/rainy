@@ -1,7 +1,7 @@
 # Rainy
 
 <p align="center">
-  <img src="https://i.imgur.com/OZqzhli.png" width="200" alt="CMNW Logo" />
+  ![TR-2](https://user-images.githubusercontent.com/907696/221422670-61897db8-4bbc-4436-969f-bdc5cf194275.svg)
 </p>
 
 ## [INVITE TO DISCORD](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)
