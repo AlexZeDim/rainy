@@ -5,7 +5,7 @@
 </p>
 
 ## [INVITE TO DISCORD](https://discord.com/oauth2/authorize?client_id=760782052986978335&scope=bot)
-[ban.command.ts](libs%2Fshared%2Fsrc%2Fcommands%2Fban.command.ts)
+
 Rainy was born as a small discord bot, that handles only one problem, checking and renaming every user on join. But as for now, it's an exclusive administrative bot for Warcraft-related discord communities. Bot is named after `Rainon` ❤️ `Janisse`. She was co-manager of [**Monk's Temple of Five Dawns**,](https://discord.com/invite/fYSNb5U) and he is founder of [**Sanctum of Light**](https://discord.com/invite/sanctumoflight) discord community for paladin players in World of Warcraft.
 [clearance.command.ts](libs%2Fshared%2Fsrc%2Fcommands%2Fclearance.command.ts)
 ## Permissions
